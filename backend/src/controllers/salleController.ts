@@ -2,8 +2,12 @@ import { Request, Response } from "express";
 import prisma from "../prisma/prismaClient";
 
 export const getAllSalles = async (req: Request, res: Response) => {
-  const salles = await prisma.salle.findMany();
-  res.status(200).json(salles);
+  try {
+    const salles = await prisma.salle.findMany();
+    res.status(200).json(salles);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
 };
 
 export const getSalleById = async (req: Request, res: Response) => {

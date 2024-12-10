@@ -24,57 +24,31 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      salles: [],
-      loading: true,
-      error: null
-    }
-  },
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 
-  methods: {
-    async chargerSalles() {
-      try {
-        console.log('Début de la requête');
-        const response = await fetch('http://localhost:4000/salles', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
+const salles = ref([]);
+const loading = ref(true);
+const error = ref(null);
 
-        console.log('Status:', response.status);
-        console.log('Headers:', response.headers);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Récupérer d'abord le texte brut pour le déboguer
-        const texte = await response.text();
-        console.log('Réponse brute:', texte);
-
-        // Tenter de parser le JSON
-        this.salles = JSON.parse(texte);
-
-      } catch (e) {
-        console.error('Erreur détaillée:', e);
-        this.error = 'Impossible de charger les salles. Veuillez réessayer plus tard.';
-      } finally {
-        this.loading = false;
-      }
-    }
-  },
-
-  async created() {
-    await this.chargerSalles();
+const chargerSalles = async () => {
+  try {
+    const response = await fetch('http://localhost:4000/salles');
+    const data = await response.json();
+    salles.value = data;
+  } catch (e) {
+    error.value = 'Impossible de charger les salles. Veuillez réessayer plus tard.';
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+onMounted(() => {
+  chargerSalles();
+});
+
 </script>
+
 
 <style scoped>
 .loading {
