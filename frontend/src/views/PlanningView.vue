@@ -1,201 +1,247 @@
 <script setup>
 import { onMounted } from 'vue'
 
+const classes = [
+    {
+        id: 1,
+        name: 'Promotion 1',
+        students: 10
+    },
+    {
+        id: 2,
+        name: 'Promotion 2',
+        students: 10
+    },
+    {
+        id: 3,
+        name: 'Promotion 3',
+        students: 10
+    }
+]
+
 const courses = [
   {
     id: 1,
     name: 'Développement projet lowcode',
     teacher: 'Dr. Martin',
     hours: 14,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 2, 
     name: 'UX Research avancé',
     teacher: 'Prof. Bernard',
     hours: 17.5,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 3, 
     name: 'Design XR',
     teacher: 'Prof. Bernard',
     hours: 21,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 4,
     name: 'Psychologie cognitive et sociologie',
     teacher: 'Dr. Petit',
     hours: 17.5,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 5,
     name: 'Méthodologie et protocole de tests',
     teacher: 'Prof. Lambert',
     hours: 21,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 6,
     name: 'Management de projets design',
     teacher: 'Dr. Rousseau',
     hours: 21,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 7,
     name: 'Veille et innovation',
     teacher: 'Prof. Moreau',
     hours: 14,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 8,
     name: 'Culture du design',
     teacher: 'Dr. Dubois',
     hours: 14,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 9,
     name: 'Projets pratiques et études de cas',
     teacher: 'Prof. Thomas',
     hours: 17.5,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 10,
     name: 'Workshop RNCP',
     teacher: 'Dr. Robert',
     hours: 31.5,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 10,
     name: 'Accompagnement mémoires',
     teacher: 'Prof. Michel',
     hours: 7,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 11,
     name: 'Anglais S1',
     teacher: 'Dr. Richard',
     hours: 14,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 12,
     name: 'Pôle associatif EEMI',
     teacher: 'Prof. Garcia',
     hours: 14,
-    semester: 1
+    semester: 1,
+    classes: [1, 2, 3]
   },
   {
     id: 13,
     name: 'Gamification',
     teacher: 'Dr. Martinez',
     hours: 17.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 14,
     teacher: 'Prof. David',
     hours: 17.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 15,
     name: 'UI conversationnel',
     teacher: 'Dr. Simon',
     hours: 17.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 16,
     name: 'Récupération et exploitation de la data pour l\'UX',
     teacher: 'Prof. Laurent',
     hours: 14,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 17,
     name: 'Propriété intellectuelle et sécurité',
     teacher: 'Dr. Roux',
     hours: 10.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 18,
     name: 'Eco-conception',
     teacher: 'Prof. Vincent',
     hours: 7,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 19,
     name: 'Direction artistique',
     teacher: 'Dr. Leroy',
     hours: 24.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 20,
     name: 'UI Design',
     teacher: 'Prof. Boyer',
     hours: 17.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 21,
     name: 'IA ethique',
     teacher: 'Dr. Leroy',
     hours: 7,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 22,
     name: 'Projets pratiques et études de cas',
     teacher: 'Prof. Michel',
     hours: 17.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 23,
     name: 'Workshop RNCP',
     teacher: 'Dr. Robert',
     hours: 31.5,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 24,
     name: 'Prise de parole en public',
     teacher: 'Dr. Rousseau',
     hours: 7,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 25,
     name: 'Accompagnement mémoires',
     teacher: 'Prof. Michel',
     hours: 7,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 26,
     name: 'Anglais S2',
     teacher: 'Dr. Richard',
     hours: 14,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   },
   {
     id: 27,
     name: 'Pôle associatif EEMI S2',
     teacher: 'Prof. Garcia',
     hours: 14,
-    semester: 2
+    semester: 2,
+    classes: [1, 2, 3]
   }
 ]
 
@@ -341,155 +387,145 @@ const indispos = [
   }
 ]
 
-// Ajouter une fonction pour vérifier si la promotion a déjà un cours
-function isPromotionBusy(date, startHour, duration, events) {
-  const startTime = new Date(`${date.toISOString().split('T')[0]}T${String(startHour).padStart(2, '0')}:00:00`);
-  const endTime = new Date(`${date.toISOString().split('T')[0]}T${String(startHour + duration).padStart(2, '0')}:00:00`);
-  
-  return events.some(event => {
-    const eventStart = new Date(event.start);
-    const eventEnd = new Date(event.end);
-    return (
-      (startTime >= eventStart && startTime < eventEnd) ||
-      (endTime > eventStart && endTime <= eventEnd) ||
-      (startTime <= eventStart && endTime >= eventEnd)
-    );
+function isTeacherAvailable(teacher, date) {
+  return !indispos.some(indispo => {
+    if (!indispo.title.includes(teacher)) return false;
+    const indispoStart = new Date(indispo.start);
+    const indispoEnd = new Date(indispo.end);
+    return date >= indispoStart && date <= indispoEnd;
   });
 }
 
-// Fonction pour générer les créneaux de cours
+function isTeacherScheduleAvailable(teacher, date, startHour, teacherSchedule) {
+  const dateStr = date.toISOString().split('T')[0];
+  const scheduleKey = `${dateStr}-${teacher}`;
+  
+  if (!teacherSchedule[scheduleKey]) {
+    return true;
+  }
+  
+  return !teacherSchedule[scheduleKey].some(schedule => 
+    schedule.startHour <= startHour && schedule.endHour > startHour
+  );
+}
+
+function markTeacherAsOccupied(teacher, date, startHour, duration, teacherSchedule) {
+  const dateStr = date.toISOString().split('T')[0];
+  const scheduleKey = `${dateStr}-${teacher}`;
+  
+  if (!teacherSchedule[scheduleKey]) {
+    teacherSchedule[scheduleKey] = [];
+  }
+  
+  teacherSchedule[scheduleKey].push({
+    startHour: startHour,
+    endHour: startHour + duration
+  });
+}
+
 function generateCourseSchedule() {
   const events = [];
-  const schoolHours = {
+  let schoolHours = {
     start: 8,
     end: 19
   };
   
   const roomSchedule = {};
+  const classSchedule = {};
+  const teacherSchedule = {};
+  const BLOCK_DURATION = 3.5;
   
-  // Fonction pour obtenir la fin de la semaine courante
-  function getCurrentWeekEnd(date) {
-    const currentWeek = weeks.find(week => {
-      const weekStart = new Date(week.start);
-      const weekEnd = new Date(week.end);
-      return date >= weekStart && date <= weekEnd;
-    });
-    return currentWeek ? new Date(currentWeek.end) : null;
-  }
-  
-  courses.forEach(course => {
-    let remainingHours = course.hours;
-    let currentDate = new Date(weeks[0].start); // Commencer à la première semaine
-    let consecutiveHours = 0;
-    let courseStartTime = null;
-    let currentRoom = null;
-    
-    while (remainingHours > 0 && currentDate <= new Date(weeks[weeks.length - 1].end)) {
-      // Vérifier si la date actuelle est dans une semaine de formation
-      if (weeks.some(week => {
-        const weekStart = new Date(week.start);
-        const weekEnd = new Date(week.end);
-        return currentDate >= weekStart && currentDate <= weekEnd;
-      }) && currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
-        const teacherUnavailable = indispos.some(indispo => {
-          const indispoStart = new Date(indispo.start);
-          const indispoEnd = new Date(indispo.end);
-          return (
-            indispo.teacherId === course.id &&
-            currentDate >= indispoStart &&
-            currentDate <= indispoEnd
-          );
-        });
-        
-        if (!teacherUnavailable) {
-          if (courseStartTime === null) {
-            courseStartTime = schoolHours.start;
-            
-            // Vérifier si la promotion a déjà un cours à ce moment
-            if (isPromotionBusy(currentDate, courseStartTime, 1, events)) {
-              schoolHours.start++;
-              if (schoolHours.start >= schoolHours.end) {
-                schoolHours.start = 8;
-                currentDate.setDate(currentDate.getDate() + 1);
-              }
-              continue;
-            }
-            
-            currentRoom = findAvailableRoom(currentDate, courseStartTime, roomSchedule);
-            if (!currentRoom) {
-              schoolHours.start++;
-              if (schoolHours.start >= schoolHours.end) {
-                schoolHours.start = 8;
-                currentDate.setDate(currentDate.getDate() + 1);
-              }
-              continue;
-            }
-          }
-          
-          // Vérifier si on peut ajouter une heure de plus et si la salle est toujours disponible
-          if (!isPromotionBusy(currentDate, courseStartTime + consecutiveHours, 1, events)) {
-            consecutiveHours++;
-            remainingHours--;
-            schoolHours.start++;
-          }
-          
-          if (schoolHours.start >= schoolHours.end || remainingHours === 0 || 
-              (getCurrentWeekEnd(currentDate) && currentDate > getCurrentWeekEnd(currentDate)) || 
-              isPromotionBusy(currentDate, courseStartTime + consecutiveHours, 1, events)) {
-            
-            if (currentRoom && consecutiveHours > 0) {
-              const event = {
-                title: `${course.name} - ${course.teacher} (${currentRoom.name})`,
-                start: `${currentDate.toISOString().split('T')[0]}T${String(courseStartTime).padStart(2, '0')}:00:00`,
-                end: `${currentDate.toISOString().split('T')[0]}T${String(courseStartTime + consecutiveHours).padStart(2, '0')}:00:00`,
-                color: '#4CAF50'
-              };
-              
-              events.push(event);
-              markRoomAsOccupied(currentRoom, currentDate, courseStartTime, consecutiveHours, roomSchedule);
-            }
-            
-            courseStartTime = null;
-            consecutiveHours = 0;
-            currentRoom = null;
-            
-            if (schoolHours.start >= schoolHours.end) {
-              schoolHours.start = 8;
-              currentDate.setDate(currentDate.getDate() + 1);
-            }
-          }
-        } else {
-          if (currentRoom && consecutiveHours > 0) {
-            const event = {
-              title: `${course.name} - ${course.teacher} (${currentRoom.name})`,
-              start: `${currentDate.toISOString().split('T')[0]}T${String(courseStartTime).padStart(2, '0')}:00:00`,
-              end: `${currentDate.toISOString().split('T')[0]}T${String(courseStartTime + consecutiveHours).padStart(2, '0')}:00:00`,
-              color: '#4CAF50'
-            };
-            events.push(event);
-            markRoomAsOccupied(currentRoom, currentDate, courseStartTime, consecutiveHours, roomSchedule);
-          }
-          courseStartTime = null;
-          consecutiveHours = 0;
-          currentRoom = null;
-          currentDate.setDate(currentDate.getDate() + 1);
-          schoolHours.start = 8;
-        }
-      } else {
-        // Si on n'est pas dans une semaine de formation, passer à la prochaine date
-        currentDate.setDate(currentDate.getDate() + 1);
-        courseStartTime = null;
-        consecutiveHours = 0;
-        currentRoom = null;
-        schoolHours.start = 8;
-      }
-    }
+  classes.forEach(classe => {
+    classSchedule[classe.id] = {
+      totalHours: 0,
+      schedule: {}
+    };
   });
   
+  courses.forEach(course => {
+    course.classes.forEach(classId => {
+      let remainingHours = course.hours;
+      let weekIndex = 0;
+      
+      while (remainingHours > 0 && weekIndex < weeks.length) {
+        let currentDate = new Date(weeks[weekIndex].start);
+        const weekEndDate = new Date(weeks[weekIndex].end);
+        
+        while (remainingHours > 0 && currentDate <= weekEndDate) {
+          if (currentDate.getDay() !== 0 && 
+              currentDate.getDay() !== 6 && 
+              isTeacherAvailable(course.teacher, currentDate)) {
+            
+            schoolHours.start = 8;
+            
+            while (schoolHours.start + BLOCK_DURATION <= schoolHours.end && remainingHours > 0) {
+              const currentRoom = findAvailableRoom(currentDate, schoolHours.start, roomSchedule);
+              
+              if (currentRoom && 
+                  isClassAvailable(classId, currentDate, schoolHours.start, classSchedule) &&
+                  isTeacherScheduleAvailable(course.teacher, currentDate, schoolHours.start, teacherSchedule)) {
+                
+                const endHour = Math.floor(schoolHours.start + BLOCK_DURATION);
+                const endMinutes = (BLOCK_DURATION % 1) * 60;
+                
+                const className = classes.find(c => c.id === classId).name;
+                
+                const event = {
+                  title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
+                  start: `${currentDate.toISOString().split('T')[0]}T${String(schoolHours.start).padStart(2, '0')}:00:00`,
+                  end: `${currentDate.toISOString().split('T')[0]}T${String(endHour).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`,
+                  color: '#4CAF50'
+                };
+                
+                events.push(event);
+                markRoomAsOccupied(currentRoom, currentDate, schoolHours.start, BLOCK_DURATION, roomSchedule);
+                markClassAsOccupied(classId, currentDate, schoolHours.start, BLOCK_DURATION, classSchedule);
+                markTeacherAsOccupied(course.teacher, currentDate, schoolHours.start, BLOCK_DURATION, teacherSchedule);
+                classSchedule[classId].totalHours += BLOCK_DURATION;
+                remainingHours -= BLOCK_DURATION;
+              }
+              
+              schoolHours.start += BLOCK_DURATION;
+            }
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+        weekIndex++;
+      }
+    });
+  });
+  
+  events.push(...indispos);
   return events;
 }
 
-// Fonction pour trouver une salle disponible
+function isClassAvailable(classId, date, startHour, classSchedule) {
+  const dateStr = date.toISOString().split('T')[0];
+  const scheduleKey = `${dateStr}-${classId}`;
+  
+  if (!classSchedule[classId].schedule[scheduleKey]) {
+    return true;
+  }
+  
+  return !classSchedule[classId].schedule[scheduleKey].some(schedule => 
+    schedule.startHour <= startHour && schedule.endHour > startHour
+  );
+}
+
+function markClassAsOccupied(classId, date, startHour, duration, classSchedule) {
+  const dateStr = date.toISOString().split('T')[0];
+  const scheduleKey = `${dateStr}-${classId}`;
+  
+  if (!classSchedule[classId].schedule[scheduleKey]) {
+    classSchedule[classId].schedule[scheduleKey] = [];
+  }
+  
+  classSchedule[classId].schedule[scheduleKey].push({
+    startHour: startHour,
+    endHour: startHour + duration
+  });
+}
+
 function findAvailableRoom(date, startHour, roomSchedule) {
   const dateStr = date.toISOString().split('T')[0];
   
@@ -510,7 +546,6 @@ function findAvailableRoom(date, startHour, roomSchedule) {
   return null;
 }
 
-// Fonction pour marquer une salle comme occupée
 function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
   const dateStr = date.toISOString().split('T')[0];
   const roomKey = `${dateStr}-${room.id}`;
@@ -525,16 +560,16 @@ function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
   });
 }
 
-// Modifier la configuration du calendrier
 onMounted(() => {
   const calendarEl = document.getElementById('calendar');
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    //initialView: 'multiMonthYear',
-    initialView: 'dayGridWeek',
+    initialView: 'multiMonthYear',
+    //initialView: 'dayGridWeek',
     initialDate: '2025-01-26',
     editable: true,
     slotMinTime: '08:00:00',
     slotMaxTime: '19:00:00',
+    locale: 'fr',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
