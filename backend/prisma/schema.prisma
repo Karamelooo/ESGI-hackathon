@@ -18,3 +18,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Salle {
+  id        String   @id @default(cuid())
+  name      String
+  capacite  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
