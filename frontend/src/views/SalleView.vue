@@ -34,31 +34,44 @@ export default {
     }
   },
 
-  async created() {
-    await this.chargerSalles()
-  },
-
   methods: {
     async chargerSalles() {
       try {
-        const response = await fetch('http://localhost:3000/api/salles')
+        console.log('Début de la requête');
+        const response = await fetch('http://localhost:4000/salles', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
 
-        // Vérification de la réponse HTTP
+        console.log('Status:', response.status);
+        console.log('Headers:', response.headers);
+
         if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`)
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Conversion et stockage des données
-        const data = await response.json()
-        this.salles = data
+        // Récupérer d'abord le texte brut pour le déboguer
+        const texte = await response.text();
+        console.log('Réponse brute:', texte);
+
+        // Tenter de parser le JSON
+        this.salles = JSON.parse(texte);
 
       } catch (e) {
-        console.error('Erreur lors du chargement des salles:', e)
-        this.error = 'Impossible de charger les salles. Veuillez réessayer plus tard.'
+        console.error('Erreur détaillée:', e);
+        this.error = 'Impossible de charger les salles. Veuillez réessayer plus tard.';
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     }
+  },
+
+  async created() {
+    await this.chargerSalles();
   }
 }
 </script>
