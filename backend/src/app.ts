@@ -1,6 +1,10 @@
 import express, { Request, Response } from "express";
 import corsMiddleware from "./middlewares/corsMiddleware";
 import userRoutes from "./routes/userRoutes";
+import postRoutes from "./routes/postRoutes";
+import commentRoutes from "./routes/commentRoutes";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 
@@ -12,6 +16,8 @@ app.use(corsMiddleware);
 
 // Routes
 app.use(userRoutes);
+app.use(postRoutes);
+app.use(commentRoutes);
 
 // test api
 app.get("/", (req: Request, res: Response) => {
