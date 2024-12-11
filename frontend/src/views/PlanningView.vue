@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const classes = [
     {
@@ -360,7 +360,7 @@ const indispos = [
     title: 'Indisponibilité - Dr. Martin',
     teacherId: 1,
     start: '2025-01-27',
-    end: '2025-01-30',
+    end: '2025-12-04',
     color: '#ff9f89'
   },
   {
@@ -443,7 +443,29 @@ function markTeacherAsOccupied(teacher, date, startHour, duration, teacherSchedu
   });
 }
 
+const courseTracking = ref({});
+
+function initializeCourseTracking() {
+  classes.forEach(classe => {
+    courseTracking.value[classe.id] = {
+      totalHours: 0,
+      courses: {}
+    };
+    courses.forEach(course => {
+      if (course.classes.includes(classe.id)) {
+        courseTracking.value[classe.id].courses[course.id] = {
+          name: course.name,
+          plannedHours: 0,
+          totalHours: course.hours,
+          remainingHours: course.hours
+        };
+      }
+    });
+  });
+}
+
 function generateCourseSchedule() {
+  initializeCourseTracking();
   const events = [];
   let schoolHours = {
     start: 8,
@@ -501,7 +523,11 @@ function generateCourseSchedule() {
                 markRoomAsOccupied(currentRoom, currentDate, schoolHours.start, BLOCK_DURATION, roomSchedule);
                 markClassAsOccupied(classId, currentDate, schoolHours.start, BLOCK_DURATION, classSchedule);
                 markTeacherAsOccupied(course.teacher, currentDate, schoolHours.start, BLOCK_DURATION, teacherSchedule);
-                classSchedule[classId].totalHours += BLOCK_DURATION;
+                
+                courseTracking.value[classId].courses[course.id].plannedHours += BLOCK_DURATION;
+                courseTracking.value[classId].courses[course.id].remainingHours -= BLOCK_DURATION;
+                courseTracking.value[classId].totalHours += BLOCK_DURATION;
+                
                 remainingHours -= BLOCK_DURATION;
               }
               
@@ -579,6 +605,23 @@ function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
   });
 }
 
+function generateReport() {
+  let report = '';
+  Object.entries(courseTracking.value).forEach(([classId, classData]) => {
+    const className = classes.find(c => c.id === parseInt(classId)).name;
+    report += `\n${className}:\n`;
+    report += `Total des heures placées: ${classData.totalHours}h\n`;
+    
+    Object.values(classData.courses).forEach(course => {
+      if(course.remainingHours > 0){
+      report += `  ${course.name}:\n`;
+        report += `    Heures restantes: ${course.remainingHours}h\n`;
+      }
+    });
+  });
+  return report;
+}
+
 onMounted(() => {
   const calendarEl = document.getElementById('calendar');
   const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -602,6 +645,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <h1>Planning</h1>
-    <div id='calendar'></div>
-  </template>
+  <h1>Planning</h1>
+  <div id='calendar'></div>
+  <div class="report">
+    <h2>Rapport des heures de cours</h2>
+    <pre>{{ generateReport() }}</pre>
+  </div>
+</template>
+
+<style scoped>
+.report {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.report pre {
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+</style>
