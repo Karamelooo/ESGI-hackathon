@@ -27,24 +27,46 @@ export const getPostById = async (req: Request, res: Response) => {
 };
 
 export const createPost = async (req: Request, res: Response) => {
-    const { title, content, authorId } = req.body;
-    try {
-      const image = req.file ? `/uploads/${req.file.filename}` : null;
-  
-      const post = await prisma.post.create({
-        data: {
-          title,
-          content,
-          image, 
-          authorId,
+  const { title, content, authorId } = req.body;
+  try {
+    const image = req.file ? `/uploads/${req.file.filename}` : null;
+
+    // Vérifier si l'utilisateur a posté dans les 12 dernières heures
+    const twelveHoursAgo = new Date();
+    twelveHoursAgo.setHours(twelveHoursAgo.getHours() - 12);
+
+    const recentPost = await prisma.post.findFirst({
+      where: {
+        authorId,
+        createdAt: {
+          gte: twelveHoursAgo, 
         },
+      },
+    });
+
+    if (recentPost) {
+      res.status(400).json({
+        message: "Vous ne pouvez poster qu'un message toutes les 12 heures.",
       });
-  
-      res.status(201).json(post);
-    } catch (error) {
-      res.status(500).json({ message: (error as Error).message });
+      return;
     }
-  };
+
+    // Créer le post si aucune restriction n'est enfreinte
+    const post = await prisma.post.create({
+      data: {
+        title,
+        content,
+        image,
+        authorId,
+      },
+    });
+
+    res.status(201).json(post);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 
 export const updatePost = async (req: Request, res: Response) => {
   const { title, content } = req.body;
