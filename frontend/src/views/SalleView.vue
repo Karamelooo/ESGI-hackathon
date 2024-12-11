@@ -32,7 +32,6 @@
 <script>
 import Toastify from 'toastify-js'
 import "toastify-js/src/toastify.css"
-import Swal from 'sweetalert2'
 
 export default {
   data() {
@@ -164,34 +163,35 @@ export default {
     },
 
     async supprimerSalle(id) {
-      const result = await Swal.fire({
-        title: 'Êtes-vous sûr ?',
-        text: "Cette action est irréversible !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui, supprimer',
-        cancelButtonText: 'Annuler'
-      });
+      try {
+        const response = await fetch(`http://localhost:4000/salles/${id}`, {
+          method: 'DELETE'
+        });
 
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch(`http://localhost:4000/salles/${id}`, {
-            method: 'DELETE'
-          });
-
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Erreur lors de la suppression de la salle');
-          }
-
-          await this.chargerSalles();
-
-          this.showSuccessToast("La salle a été supprimée avec succès !");
-        } catch (e) {
-          this.showErrorToast(e.message || "Erreur lors de la suppression de la salle.");
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Erreur lors de la suppression de la salle');
         }
+
+        await this.chargerSalles();
+
+        Toastify({
+          text: "La salle a été supprimée avec succès !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
+      } catch (e) {
+        Toastify({
+          text: e.message || "Erreur lors de la suppression de la salle.",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
       }
     },
 
@@ -209,28 +209,6 @@ export default {
       } else {
         await this.ajouterSalle();
       }
-    },
-
-    showSuccessToast(message) {
-      Toastify({
-        text: message,
-        duration: 3000,
-        close: true,
-        gravity: "top",
-        position: "right",
-        backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
-      }).showToast();
-    },
-
-    showErrorToast(message) {
-      Toastify({
-        text: message,
-        duration: 3000,
-        close: true,
-        gravity: "top",
-        position: "right",
-        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-      }).showToast();
     }
   },
 
