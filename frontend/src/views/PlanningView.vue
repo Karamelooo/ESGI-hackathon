@@ -26,7 +26,8 @@ const courses = [
     teacher: 'Dr. Martin',
     hours: 14,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#FF6B6B'
   },
   {
     id: 2, 
@@ -34,7 +35,8 @@ const courses = [
     teacher: 'Prof. Bernard',
     hours: 17.5,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#4ECDC4'
   },
   {
     id: 3, 
@@ -42,7 +44,8 @@ const courses = [
     teacher: 'Prof. Bernard',
     hours: 21,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#45B7D1'
   },
   {
     id: 4,
@@ -50,7 +53,8 @@ const courses = [
     teacher: 'Dr. Petit',
     hours: 17.5,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#96CEB4'
   },
   {
     id: 5,
@@ -58,7 +62,8 @@ const courses = [
     teacher: 'Prof. Lambert',
     hours: 21,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#FFEEAD'
   },
   {
     id: 6,
@@ -66,7 +71,8 @@ const courses = [
     teacher: 'Dr. Rousseau',
     hours: 21,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#D4A5A5'
   },
   {
     id: 7,
@@ -74,7 +80,8 @@ const courses = [
     teacher: 'Prof. Moreau',
     hours: 14,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#9B59B6'
   },
   {
     id: 8,
@@ -82,7 +89,8 @@ const courses = [
     teacher: 'Dr. Dubois',
     hours: 14,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#3498DB'
   },
   {
     id: 9,
@@ -90,7 +98,8 @@ const courses = [
     teacher: 'Prof. Thomas',
     hours: 17.5,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#E67E22'
   },
   {
     id: 10,
@@ -98,46 +107,44 @@ const courses = [
     teacher: 'Dr. Robert',
     hours: 31.5,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#2ECC71'
   },
   {
-    id: 10,
+    id: 11,
     name: 'Accompagnement mémoires',
     teacher: 'Prof. Michel',
     hours: 7,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#F1C40F'
   },
   {
-    id: 11,
+    id: 12,
     name: 'Anglais S1',
     teacher: 'Dr. Richard',
     hours: 14,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#E74C3C'
   },
   {
-    id: 12,
+    id: 13,
     name: 'Pôle associatif EEMI',
     teacher: 'Prof. Garcia',
     hours: 14,
     semester: 1,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#1ABC9C'
   },
   {
-    id: 13,
+    id: 14,
     name: 'Gamification',
     teacher: 'Dr. Martinez',
     hours: 17.5,
     semester: 2,
-    classes: [1, 2, 3]
-  },
-  {
-    id: 14,
-    teacher: 'Prof. David',
-    hours: 17.5,
-    semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#D35400'
   },
   {
     id: 15,
@@ -145,7 +152,8 @@ const courses = [
     teacher: 'Dr. Simon',
     hours: 17.5,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#8E44AD'
   },
   {
     id: 16,
@@ -153,7 +161,8 @@ const courses = [
     teacher: 'Prof. Laurent',
     hours: 14,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#2980B9'
   },
   {
     id: 17,
@@ -161,7 +170,8 @@ const courses = [
     teacher: 'Dr. Roux',
     hours: 10.5,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#27AE60'
   },
   {
     id: 18,
@@ -169,7 +179,8 @@ const courses = [
     teacher: 'Prof. Vincent',
     hours: 7,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#F39C12'
   },
   {
     id: 19,
@@ -177,7 +188,8 @@ const courses = [
     teacher: 'Dr. Leroy',
     hours: 24.5,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#C0392B'
   },
   {
     id: 20,
@@ -185,7 +197,8 @@ const courses = [
     teacher: 'Prof. Boyer',
     hours: 17.5,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#16A085'
   },
   {
     id: 21,
@@ -193,7 +206,8 @@ const courses = [
     teacher: 'Dr. Leroy',
     hours: 7,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#7F8C8D'
   },
   {
     id: 22,
@@ -201,7 +215,8 @@ const courses = [
     teacher: 'Prof. Michel',
     hours: 17.5,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#E67E22'
   },
   {
     id: 23,
@@ -209,7 +224,8 @@ const courses = [
     teacher: 'Dr. Robert',
     hours: 31.5,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#2ECC71'
   },
   {
     id: 24,
@@ -217,7 +233,8 @@ const courses = [
     teacher: 'Dr. Rousseau',
     hours: 7,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#BDC3C7'
   },
   {
     id: 25,
@@ -225,7 +242,8 @@ const courses = [
     teacher: 'Prof. Michel',
     hours: 7,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#F1C40F'
   },
   {
     id: 26,
@@ -233,7 +251,8 @@ const courses = [
     teacher: 'Dr. Richard',
     hours: 14,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#E74C3C'
   },
   {
     id: 27,
@@ -241,7 +260,8 @@ const courses = [
     teacher: 'Prof. Garcia',
     hours: 14,
     semester: 2,
-    classes: [1, 2, 3]
+    classes: [1, 2, 3],
+    color: '#1ABC9C'
   }
 ]
 
@@ -339,50 +359,50 @@ const indispos = [
   {
     title: 'Indisponibilité - Dr. Martin',
     teacherId: 1,
-    start: '2024-08-05',
-    end: '2024-08-19',
+    start: '2025-01-27',
+    end: '2025-01-30',
     color: '#ff9f89'
   },
   {
     title: 'Indisponibilité - Prof. Dubois',
     teacherId: 2,
-    start: '2024-08-12', 
-    end: '2024-08-26',
+    start: '2025-08-12', 
+    end: '2025-08-26',
     color: '#ff9f89'
   },
   {
     title: 'Indisponibilité - Dr. Bernard',
     teacherId: 3,
-    start: '2024-09-02',
-    end: '2024-09-16', 
+    start: '2025-09-02',
+    end: '2025-09-16', 
     color: '#ff9f89'
   },
   {
     title: 'Indisponibilité - Prof. Lambert',
     teacherId: 4,
-    start: '2024-09-16',
-    end: '2024-09-30',
+    start: '2025-09-16',
+    end: '2025-09-30',
     color: '#ff9f89'
   },
   {
     title: 'Indisponibilité - Dr. Petit',
     teacherId: 5,
-    start: '2024-10-07',
-    end: '2024-10-21',
+    start: '2025-10-07',
+    end: '2025-10-21',
     color: '#ff9f89'
   },
   {
     title: 'Indisponibilité - Prof. Moreau',
     teacherId: 6,
-    start: '2024-11-04',
-    end: '2024-11-18',
+    start: '2025-11-04',
+    end: '2025-11-18',
     color: '#ff9f89'
   },
   {
     title: 'Indisponibilité - Dr. Rousseau',
     teacherId: 7,
-    start: '2024-12-02',
-    end: '2024-12-16',
+    start: '2025-12-02',
+    end: '2025-12-16',
     color: '#ff9f89'
   }
 ]
@@ -474,7 +494,7 @@ function generateCourseSchedule() {
                   title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
                   start: `${currentDate.toISOString().split('T')[0]}T${String(schoolHours.start).padStart(2, '0')}:00:00`,
                   end: `${currentDate.toISOString().split('T')[0]}T${String(endHour).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`,
-                  color: '#4CAF50'
+                  color: course.color
                 };
                 
                 events.push(event);
@@ -495,7 +515,6 @@ function generateCourseSchedule() {
     });
   });
   
-  events.push(...indispos);
   return events;
 }
 
