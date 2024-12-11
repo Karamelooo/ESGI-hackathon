@@ -12,13 +12,21 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  posts     Post[]
-  Comment   Comment[]
+  id            String       @id @default(cuid())
+  lastname      String?
+  firstname     String?
+  email         String       @unique
+  password      String
+  address       String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  superAdmin    Boolean      @default(false)
+  posts         Post[]
+  Comment       Comment[]
+  Etudiant      Etudiant?    @relation(fields: [etudiantId], references: [id])
+  Intervenant   Intervenant? @relation(fields: [intervenantId], references: [id])
+  etudiantId    String?
+  intervenantId String?
 }
 
 model Post {
@@ -51,4 +59,37 @@ model Salle {
   capacite  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Etudiant {
+  id        String       @id @default(cuid())
+  promotion promotions[]
+  User      User[]
+}
+
+model Intervenant {
+  id       String     @id @default(cuid())
+  matieres matieres[]
+  User     User[]
+}
+
+// temporaire
+model matieres {
+  id            Int          @id @default(autoincrement())
+  name          String?
+  hours         Int?
+  semester      Int?
+  color         String       @unique
+  Intervenant   Intervenant? @relation(fields: [intervenantId], references: [id])
+  intervenantId String?
+}
+
+// temporaire
+model promotions {
+  id         Int       @id @default(autoincrement())
+  name       String?
+  students   Int?
+  courses    Int[]     @default([1])
+  Etudiant   Etudiant? @relation(fields: [etudiantId], references: [id])
+  etudiantId String?
 }

@@ -4,9 +4,13 @@ import userRoutes from "./routes/userRoutes";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import salleRoutes from "./routes/salleRoutes";
+import authRoutes from "./routes/authRoutes";
 import dotenv from "dotenv";
-dotenv.config();
 import path from "path";
+import prisma from "./prisma/prismaClient";
+import { Prisma } from "@prisma/client";
+
+dotenv.config();
 
 const app = express();
 
@@ -23,6 +27,7 @@ app.use(userRoutes);
 app.use(postRoutes);
 app.use(commentRoutes);
 app.use(salleRoutes);
+app.use(authRoutes);
 
 // test api
 app.get("/", (req: Request, res: Response) => {
@@ -32,5 +37,34 @@ app.get("/", (req: Request, res: Response) => {
     res.status(500).json({ message: (error as Error).message });
   }
 });
+
+// const initialisation = async () => {
+//   // initialisation de l'utilisateur superadmin
+//   try {
+//     await prisma.user.upsert({
+//       where: { email: 'user@example.com' },
+//       create: {
+//         lastname: 'Super',
+//         firstname: 'Admin',
+//         email: 'user@example.com',
+//         superAdmin: true
+//       },
+//       update: {},
+//     });
+//   } catch (error) {
+//     if (error instanceof Prisma.PrismaClientKnownRequestError) {
+//       // Handle known errors
+//       if (error.code === 'P2002') {
+//         console.error('Unique constraint violation: A user with this email already exists.');
+//       } else {
+//         console.error(`Prisma error code ${error.code}: ${error.message}`);
+//       }
+//     } else {
+//       console.error(error)
+//     }
+//   }
+// }
+
+// initialisation()
 
 export default app;
