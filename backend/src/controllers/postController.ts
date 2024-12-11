@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/prismaClient";
+import * as multer from "multer";
 
 interface RequestWithFile extends Request {
   file?: Express.Multer.File;
