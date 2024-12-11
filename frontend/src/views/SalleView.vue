@@ -6,7 +6,7 @@
       <h2>{{ salle.id ? 'Modifier' : 'Ajouter' }} une salle</h2>
       <form @submit.prevent="soumettreFormulaire">
         <input v-model="salle.name" placeholder="Nom de la salle" required>
-        <input v-model.number="salle.capacite" type="number" placeholder="Capacité" required>
+        <input v-model.number="salle.capacite" type="number" step="1" min="1" max="999" placeholder="Capacité" required>
         <button type="submit">{{ salle.id ? 'Modifier' : 'Ajouter' }}</button>
         <button type="button" v-if="salle.id" @click="reinitialiserFormulaire">Annuler</button>
       </form>
@@ -332,4 +332,12 @@ button:hover {
   color: red;
   border: 1px solid red;
 }
+
+input {
+  width: 150px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 </style>
