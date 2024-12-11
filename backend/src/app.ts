@@ -7,7 +7,6 @@ import salleRoutes from "./routes/salleRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
-import salleRoutes from "./routes/salleRoutes";
 
 const app = express();
 
