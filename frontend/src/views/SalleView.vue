@@ -57,8 +57,50 @@ export default {
       }
     },
 
+    validateForm() {
+      if (!this.salle.name || !this.salle.capacite) {
+        Toastify({
+          text: "Veuillez remplir tous les champs !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+        return false;
+      }
+
+      if (!Number.isInteger(this.salle.capacite)) {
+        Toastify({
+          text: "La capacité doit être un nombre entier !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+        return false;
+      }
+
+      if (this.salle.capacite <= 0) {
+        Toastify({
+          text: "La capacité ne peut pas être négative ou égale à 0 !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+        return false;
+      }
+
+      return true;
+    },
+
     async ajouterSalle() {
       try {
+        if (!this.validateForm()) return;
+
         const salleExistante = this.salles.find(s =>
           s.name.toLowerCase() === this.salle.name.toLowerCase()
         );
@@ -111,6 +153,8 @@ export default {
 
     async mettreAJourSalle() {
       try {
+        if (!this.validateForm()) return;
+
         const salleExistante = this.salles.find(s =>
           s.name.toLowerCase() === this.salle.name.toLowerCase() &&
           s.id !== this.salle.id
