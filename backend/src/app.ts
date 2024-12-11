@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import corsMiddleware from "./middlewares/corsMiddleware";
 import userRoutes from "./routes/userRoutes";
 import salleRoutes from "./routes/salleRoutes";
-import materielRoutes from "./routes/materielRoutes";
+import materielsRoutes from "./routes/materielsRoutes";
 const app = express();
 
 // JSON
@@ -14,7 +14,7 @@ app.use(corsMiddleware);
 // Routes
 app.use(userRoutes);
 app.use(salleRoutes);
-app.use(materielRoutes);
+app.use(materielsRoutes);
 
 // test api
 app.get("/", (req: Request, res: Response) => {
