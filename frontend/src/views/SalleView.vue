@@ -2,7 +2,6 @@
   <div>
     <h1>Gestion des Salles</h1>
 
-    <!-- Formulaire d'ajout/modification -->
     <div class="form-container">
       <h2>{{ salle.id ? 'Modifier' : 'Ajouter' }} une salle</h2>
       <form @submit.prevent="soumettreFormulaire">
@@ -13,7 +12,6 @@
       </form>
     </div>
 
-    <!-- Liste des salles -->
     <div v-if="loading" class="loading">Chargement...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
@@ -43,7 +41,6 @@ export default {
   },
 
   methods: {
-    // Lecture (Read)
     async chargerSalles() {
       try {
         const response = await fetch('http://localhost:4000/salles');
@@ -57,7 +54,6 @@ export default {
       }
     },
 
-    // Création (Create)
     async ajouterSalle() {
       try {
         const response = await fetch('http://localhost:4000/salles', {
@@ -73,7 +69,6 @@ export default {
       }
     },
 
-    // Mise à jour (Update)
     async mettreAJourSalle() {
       try {
         const response = await fetch(`http://localhost:4000/salles/${this.salle.id}`, {
@@ -89,7 +84,6 @@ export default {
       }
     },
 
-    // Suppression (Delete)
     async supprimerSalle(id) {
       if (!confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')) return;
 
@@ -104,7 +98,6 @@ export default {
       }
     },
 
-    // Méthodes utilitaires
     modifierSalle(salle) {
       this.salle = { ...salle };
     },
