@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -10,23 +10,50 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/planning',
-      name: 'planning',
-      component: () => import('../views/PlanningView.vue'),
+      path: '/calendar',
+      name: 'calendar',
+      component: () => import('../views/CalendarView.vue'),
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/rooms',
+      name: 'rooms',
+      component: () => import('../views/RoomsView.vue'),
+    },
+    {
+      path: '/materials',
+      name: 'material',
+      component: () => import('../views/MaterialView.vue'),
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: () => import('../views/UsersView.vue'),
+    },
+    {
+      path: '/reservations',
+      name: 'reservations',
+      component: () => import('../views/ReservationView.vue'),
     },
     {
       path: '/salles',
       name: 'salles',
       component: () => import('../views/SalleView.vue'),
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LoginView.vue'),
+    },
+    {
+      path: '/statistics',
+      name: 'statistics',
+      component: () => import('../views/StatisticsView.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue'),
+    }
   ],
 })
 

@@ -1,7 +1,12 @@
 import express, { Request, Response } from "express";
 import corsMiddleware from "./middlewares/corsMiddleware";
 import userRoutes from "./routes/userRoutes";
+import postRoutes from "./routes/postRoutes";
+import commentRoutes from "./routes/commentRoutes";
 import salleRoutes from "./routes/salleRoutes";
+import dotenv from "dotenv";
+dotenv.config();
+import path from "path";
 
 const app = express();
 
@@ -11,8 +16,12 @@ app.use(express.json());
 // CORS
 app.use(corsMiddleware);
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Routes
 app.use(userRoutes);
+app.use(postRoutes);
+app.use(commentRoutes);
 app.use(salleRoutes);
 
 // test api
