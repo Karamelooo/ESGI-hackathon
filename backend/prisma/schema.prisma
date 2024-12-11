@@ -12,12 +12,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Post      Post[]
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  posts     Post[]
+  Comment   Comment[]
 }
 
 model Post {
@@ -29,7 +30,7 @@ model Post {
   updatedAt DateTime  @updatedAt
   authorId  String
   author    User      @relation(fields: [authorId], references: [id])
-  Comment   Comment[]
+  comments  Comment[]
 }
 
 model Comment {
@@ -40,5 +41,6 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
 }

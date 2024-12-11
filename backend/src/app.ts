@@ -5,6 +5,7 @@ import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import dotenv from "dotenv";
 dotenv.config();
+import path from "path";
 
 const app = express();
 
@@ -13,6 +14,8 @@ app.use(express.json());
 
 // CORS
 app.use(corsMiddleware);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use(userRoutes);

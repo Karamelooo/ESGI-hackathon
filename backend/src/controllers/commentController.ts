@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/prismaClient";
 
-// Get all comments for a specific post
 export const getCommentsByPostId = async (req: Request, res: Response) => {
   try {
     const comments = await prisma.comment.findMany({
@@ -13,7 +12,6 @@ export const getCommentsByPostId = async (req: Request, res: Response) => {
   }
 };
 
-// Create a comment
 export const createComment = async (req: Request, res: Response) => {
   const { content, postId, authorId } = req.body;
 
@@ -27,7 +25,6 @@ export const createComment = async (req: Request, res: Response) => {
   }
 };
 
-// Delete a comment
 export const deleteComment = async (req: Request, res: Response) => {
   try {
     await prisma.comment.delete({ where: { id: req.params.id } });
