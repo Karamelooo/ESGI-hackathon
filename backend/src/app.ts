@@ -10,6 +10,7 @@ import matiereMappingRoutes from "./routes/matiereMappingRoutes";
 import intervenantRoutes from "./routes/intervenantRoutes";
 import indisponibiliteRoutes from "./routes/indisponibiliteRoutes";
 import courseRoutes from "./routes/courseRoutes";
+import pauseRoutes from "./routes/pauseRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
@@ -35,6 +36,7 @@ app.use(matiereMappingRoutes);
 app.use(intervenantRoutes);
 app.use(indisponibiliteRoutes);
 app.use(courseRoutes);
+app.use(pauseRoutes);
 
 // test api
 app.get("/", (req: Request, res: Response) => {
