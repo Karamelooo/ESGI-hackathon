@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/prismaClient";
 
+interface RequestWithFile extends Request {
+  file?: Express.Multer.File;
+}
+
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
     const posts = await prisma.post.findMany({ include: { comments: true } });
@@ -26,7 +30,7 @@ export const getPostById = async (req: Request, res: Response) => {
   }
 };
 
-export const createPost = async (req: Request, res: Response) => {
+export const createPost = async (req: RequestWithFile, res: Response) => {
   const { title, content, authorId } = req.body;
   try {
     const image = req.file ? `/uploads/${req.file.filename}` : null;
