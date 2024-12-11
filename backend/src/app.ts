@@ -3,6 +3,7 @@ import corsMiddleware from "./middlewares/corsMiddleware";
 import userRoutes from "./routes/userRoutes";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import salleRoutes from "./routes/salleRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";

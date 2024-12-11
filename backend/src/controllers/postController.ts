@@ -31,7 +31,6 @@ export const createPost = async (req: Request, res: Response) => {
   try {
     const image = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // Vérifier si l'utilisateur a posté dans les 12 dernières heures
     const twelveHoursAgo = new Date();
     twelveHoursAgo.setHours(twelveHoursAgo.getHours() - 12);
 
@@ -51,7 +50,6 @@ export const createPost = async (req: Request, res: Response) => {
       return;
     }
 
-    // Créer le post si aucune restriction n'est enfreinte
     const post = await prisma.post.create({
       data: {
         title,
