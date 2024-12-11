@@ -94,6 +94,18 @@ export default {
         return false;
       }
 
+      if (this.salle.capacite > 999) {
+        Toastify({
+          text: "La capacité ne peut pas dépasser 999 !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+        return false;
+      }
+
       return true;
     },
 
