@@ -44,3 +44,11 @@ model Comment {
   post   Post @relation(fields: [postId], references: [id])
   author User @relation(fields: [authorId], references: [id])
 }
+
+model Salle {
+  id        String   @id @default(cuid())
+  name      String
+  capacite  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

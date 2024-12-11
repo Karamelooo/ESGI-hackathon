@@ -6,6 +6,7 @@ import commentRoutes from "./routes/commentRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
+import salleRoutes from "./routes/salleRoutes";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(userRoutes);
 app.use(postRoutes);
 app.use(commentRoutes);
+app.use(salleRoutes);
 
 // test api
 app.get("/", (req: Request, res: Response) => {
