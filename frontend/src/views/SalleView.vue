@@ -30,6 +30,9 @@
 </template>
 
 <script>
+import Toastify from 'toastify-js'
+import "toastify-js/src/toastify.css"
+
 export default {
   data() {
     return {
@@ -56,45 +59,139 @@ export default {
 
     async ajouterSalle() {
       try {
+        const salleExistante = this.salles.find(s =>
+          s.name.toLowerCase() === this.salle.name.toLowerCase()
+        );
+
+        if (salleExistante) {
+          Toastify({
+            text: "Une salle avec ce nom existe déjà !",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          }).showToast();
+          return;
+        }
+
         const response = await fetch('http://localhost:4000/salles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(this.salle)
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Erreur lors de l\'ajout de la salle');
+        }
+
         await this.chargerSalles();
         this.reinitialiserFormulaire();
+
+        Toastify({
+          text: "La salle a été ajoutée avec succès !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
       } catch (e) {
-        this.error = 'Erreur lors de l\'ajout de la salle.';
+        Toastify({
+          text: e.message || "Erreur lors de l'ajout de la salle.",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
       }
     },
 
     async mettreAJourSalle() {
       try {
+        const salleExistante = this.salles.find(s =>
+          s.name.toLowerCase() === this.salle.name.toLowerCase() &&
+          s.id !== this.salle.id
+        );
+
+        if (salleExistante) {
+          Toastify({
+            text: "Une salle avec ce nom existe déjà !",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          }).showToast();
+          return;
+        }
+
         const response = await fetch(`http://localhost:4000/salles/${this.salle.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(this.salle)
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Erreur lors de la modification de la salle');
+        }
+
         await this.chargerSalles();
         this.reinitialiserFormulaire();
+
+        Toastify({
+          text: "La salle a été modifiée avec succès !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
       } catch (e) {
-        this.error = 'Erreur lors de la modification de la salle.';
+        Toastify({
+          text: e.message || "Erreur lors de la modification de la salle.",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
       }
     },
 
     async supprimerSalle(id) {
-      if (!confirm('Êtes-vous sûr de vouloir supprimer cette salle ?')) return;
-
       try {
         const response = await fetch(`http://localhost:4000/salles/${id}`, {
           method: 'DELETE'
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Erreur lors de la suppression de la salle');
+        }
+
         await this.chargerSalles();
+
+        Toastify({
+          text: "La salle a été supprimée avec succès !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
       } catch (e) {
-        this.error = 'Erreur lors de la suppression de la salle.';
+        Toastify({
+          text: e.message || "Erreur lors de la suppression de la salle.",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
       }
     },
 

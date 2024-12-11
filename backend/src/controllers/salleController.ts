@@ -18,9 +18,34 @@ export const getSalleById = async (req: Request, res: Response) => {
 };
 
 export const createSalle = async (req: Request, res: Response) => {
-  const { name, capacite } = req.body;
-  const salle = await prisma.salle.create({ data: { name, capacite } });
-  res.status(201).json(salle);
+  try {
+    const { name, capacite } = req.body;
+
+    const salleExistante = await prisma.salle.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: 'insensitive'
+        }
+      }
+    });
+
+    if (salleExistante) {
+      return res.status(400).json({ 
+        message: 'Une salle avec ce nom existe déjà' 
+      });
+    }
+
+    const salle = await prisma.salle.create({ 
+      data: { name, capacite } 
+    });
+
+    res.status(201).json(salle);
+  } catch (error) {
+    res.status(500).json({ 
+      message: (error as Error).message 
+    });
+  }
 };
 
 export const updateSalle = async (req: Request, res: Response) => {
