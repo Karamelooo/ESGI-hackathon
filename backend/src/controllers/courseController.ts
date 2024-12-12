@@ -60,3 +60,14 @@ export const deleteCourse = async (req: Request, res: Response) => {
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+export const getCourseIntervenant = async (req: Request, res: Response) => {
+  try {
+    const courses = await prisma.course.findMany({
+      where: { intervenantId: req.params.intervenantId }
+    });
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};

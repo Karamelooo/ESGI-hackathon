@@ -5,10 +5,12 @@ import {
   getCourseById,
   updateCourse,
   deleteCourse,
+  getCourseIntervenant
 } from "../controllers/courseController";
 
 const router = Router();
 
+router.get("/courses/intervenant/:intervenantId", getCourseIntervenant)
 router.post("/courses", createCourse);
 router.get("/courses", getAllCourses);
 router.get("/courses/:id", getCourseById);
