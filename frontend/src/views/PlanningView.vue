@@ -13,6 +13,7 @@ const weeks = ref([
 ])
 const salles = ref([])
 const indispos = ref([])
+const intervenants = ref([])
 
 // Fonctions pour récupérer les données
 const fetchPromotions = async () => {
@@ -40,9 +41,25 @@ const fetchSalles = async () => {
 }
 
 const fetchIndisponibilites = async () => {
-  const response = await fetch('http://localhost:4000/indisponibilite')
+  const response = await fetch('http://localhost:4000/indisponibilites')
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des indisponibilités')
+  }
+  return response.json()
+}
+
+const fetchIntervenants = async () => {
+  const response = await fetch('http://localhost:4000/intervenants')
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des intervenants')
+  }
+  return response.json()
+}
+
+const fetchMatiereMapping = async () => {
+  const response = await fetch('http://localhost:4000/matieres-mapping')
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des matiereMapping')
   }
   return response.json()
 }
@@ -50,31 +67,61 @@ const fetchIndisponibilites = async () => {
 // Chargement des données au montage du composant
 onMounted(async () => {
   try {
-    const [newPromotions, newMatieres, newSalles, newIndispos] = await Promise.all([
+    const [newPromotions, newMatieres, newSalles, newIndispos, newIntervenants, newMatiereMapping] = await Promise.all([
       fetchPromotions(),
       fetchMatieres(),
       fetchSalles(),
-      fetchIndisponibilites()
+      fetchIndisponibilites(),
+      fetchIntervenants(),
+      fetchMatiereMapping()
     ])
+
+    console.log('Promotions reçues:', newPromotions);
+    console.log('Matières reçues:', newMatieres);
+    console.log('Salles reçues:', newSalles);
+    console.log('Indispos reçues:', newIndispos);
+    console.log('Intervenants reçus:', newIntervenants);
+    console.log('MatiereMapping reçus:', newMatiereMapping);
+
+    // Associer les matiereMapping aux matieres
+    newMatieres.forEach(matiere => {
+      matiere.matiereMapping = newMatiereMapping.filter(mapping => mapping.matiereId === matiere.id);
+    });
 
     if (newPromotions) {
       classes.value = newPromotions.map(p => ({
         id: p.id,
         name: p.name,
-        students: 10 // À adapter selon votre modèle
+        students: p.students
       }))
+      console.log('Classes après mapping:', classes.value);
     }
     
     if (newMatieres) {
-      courses.value = newMatieres.map(m => ({
-        id: m.id,
-        name: m.name,
-        teacher: `${m.intervenant.firstname} ${m.intervenant.name}`,
-        hours: m.matiereMapping[0].volumeHeure,
-        semester: m.semester,
-        classes: m.matiereMapping.map(mm => mm.promotionId),
-        color: m.color
-      }))
+      courses.value = newMatieres.map(m => {
+        const mappings = m.matiereMapping || [];
+        console.log('Mappings pour matière', m.name, ':', mappings);
+        
+        const totalHours = mappings.reduce((sum, mapping) => sum + (mapping.volumeHeure || 0), 0);
+        console.log('Total heures:', totalHours);
+        
+        const teacherMapping = mappings.find(mapping => mapping.intervenantId);
+        const intervenant = intervenants.value.find(int => int.id === teacherMapping?.intervenantId);
+        const teacher = intervenant ? 
+          `${intervenant.firstname} ${intervenant.name}` : 
+          'Pas d\'intervenant';
+        
+        return {
+          id: m.id,
+          name: m.name,
+          teacher: teacher,
+          hours: totalHours,
+          semester: m.semester,
+          classes: mappings.map(mm => mm.promotionId).filter(Boolean),
+          color: m.color
+        };
+      });
+      console.log('Courses après mapping:', courses.value);
     }
     
     if (newSalles) {
@@ -83,17 +130,38 @@ onMounted(async () => {
         name: s.name,
         capacity: s.capacity
       }))
+      console.log('Salles après mapping:', salles.value);
+    }
+
+    if (newIntervenants) {
+      intervenants.value = newIntervenants;
+      console.log('Intervenants après assignation:', intervenants.value);
     }
     
     if (newIndispos) {
-      indispos.value = newIndispos.map(i => ({
-        title: `Indisponibilité - ${i.intervenant.firstname} ${i.intervenant.name}`,
-        teacherId: i.intervenantId,
-        start: i.startDate,
-        end: i.endDate,
-        color: '#ff9f89'
-      }))
+      indispos.value = newIndispos.map(i => {
+        const intervenant = intervenants.value.find(int => int.id === i.intervenantId);
+        console.log('Intervenant trouvé pour indispo:', intervenant);
+        
+        const teacherName = intervenant ? 
+          `${intervenant.firstname} ${intervenant.name}` : 
+          `Intervenant ${i.intervenantId}`;
+        
+        return {
+          title: `Indisponibilité - ${teacherName}`,
+          teacherId: i.intervenantId,
+          start: new Date(i.start).toISOString(),
+          end: new Date(i.end).toISOString(),
+          color: '#ff9f89'
+        };
+      });
+      console.log('Indispos après mapping:', indispos.value);
     }
+
+    // Après avoir tout chargé, générer et afficher les événements
+    const events = generateCourseSchedule();
+    console.log('Événements générés:', events);
+
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)
   }
