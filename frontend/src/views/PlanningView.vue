@@ -28,7 +28,7 @@ const courses = [
     teacher: 'Dr. Martin',
     hours: 14,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#FF6B6B',
   },
   {
@@ -37,115 +37,115 @@ const courses = [
     teacher: 'Prof. Bernard',
     hours: 17.5,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#4ECDC4',
   },
   {
     id: 3, 
     name: 'Design XR',
     teacher: 'Prof. Bernard',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#45B7D1',
   },
   {
     id: 4,
     name: 'Psychologie cognitive et sociologie',
     teacher: 'Dr. Petit',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#96CEB4',
   },
   {
     id: 5,
     name: 'Méthodologie et protocole de tests',
     teacher: 'Prof. Lambert',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#FFEEAD',
   },
   {
     id: 6,
     name: 'Management de projets design',
     teacher: 'Dr. Rousseau',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#D4A5A5',
   },
   {
     id: 7,
     name: 'Veille et innovation',
     teacher: 'Prof. Moreau',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#9B59B6',
   },
   {
     id: 8,
     name: 'Culture du design',
     teacher: 'Dr. Dubois',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#3498DB',
   },
   {
     id: 9,
     name: 'Projets pratiques et études de cas',
     teacher: 'Prof. Thomas',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#E67E22',
   },
   {
     id: 10,
     name: 'Workshop RNCP',
     teacher: 'Dr. Robert',
-  hours: 3,
+    hours: 3,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#2ECC71',
   },
   {
     id: 11,
     name: 'Accompagnement mémoires',
     teacher: 'Prof. Michel',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#F1C40F',
   },
   {
     id: 12,
     name: 'Anglais S1',
     teacher: 'Dr. Richard',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#E74C3C',
   },
   {
     id: 13,
     name: 'Pôle associatif EEMI',
     teacher: 'Prof. Garcia',
-    hours: 0,
+    hours: 10,
     semester: 1,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#1ABC9C',
   },
   {
     id: 14,
     name: 'Gamification',
     teacher: 'Dr. Martinez',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#D35400',
   },
   {
@@ -154,43 +154,43 @@ const courses = [
     teacher: 'Dr. Simon',
     hours: 17.5,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#8E44AD',
   },
   {
     id: 16,
     name: 'Récupération et exploitation de la data pour l\'UX',
     teacher: 'Prof. Laurent',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#2980B9',
   },
   {
     id: 17,
     name: 'Propriété intellectuelle et sécurité',
     teacher: 'Dr. Roux',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#27AE60',
   },
   {
     id: 18,
     name: 'Eco-conception',
     teacher: 'Prof. Vincent',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#F39C12',
   },
   {
     id: 19,
     name: 'Direction artistique',
     teacher: 'Dr. Leroy',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#C0392B',
   },
   {
@@ -199,70 +199,70 @@ const courses = [
     teacher: 'Prof. Boyer',
     hours: 17.5,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#16A085',
   },
   {
     id: 21,
     name: 'IA ethique',
     teacher: 'Dr. Leroy',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#7F8C8D',
   },
   {
     id: 22,
     name: 'Projets pratiques et études de cas',
     teacher: 'Prof. Michel',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#E67E22',
   },
   {
     id: 23,
     name: 'Workshop RNCP',
     teacher: 'Dr. Robert',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#2ECC71',
   },
   {
     id: 24,
     name: 'Prise de parole en public',
     teacher: 'Dr. Rousseau',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#BDC3C7',
   },
   {
     id: 25,
     name: 'Accompagnement mémoires',
     teacher: 'Prof. Michel',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#F1C40F',
   },
   {
     id: 26,
     name: 'Anglais S2',
     teacher: 'Dr. Richard',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#E74C3C',
   },
   {
     id: 27,
     name: 'Pôle associatif EEMI S2',
     teacher: 'Prof. Garcia',
-    hours: 0,
+    hours: 10,
     semester: 2,
-    classes: [1],
+    classes: [1, 2, 3],
     color: '#1ABC9C',
   }
 ]
@@ -455,6 +455,7 @@ function markTeacherAsOccupied(teacher, date, startHour, duration, teacherSchedu
 const courseTracking = ref({});
 
 function initializeCourseTracking() {
+  courseTracking.value = {};
   classes.forEach(classe => {
     courseTracking.value[classe.id] = {
       totalHours: 0,
@@ -603,6 +604,14 @@ function generateCourseSchedule() {
   const classSchedule = {};
   const teacherSchedule = {};
   
+  // Filtrer les cours pour ne garder que ceux qui ont des classes existantes
+  const validCourses = courses.map(course => ({
+    ...course,
+    classes: course.classes.filter(classId => 
+      classes.some(c => c.id === classId)
+    )
+  })).filter(course => course.classes.length > 0);
+  
   classes.forEach(classe => {
     classSchedule[classe.id] = {
       totalHours: 0,
@@ -610,7 +619,7 @@ function generateCourseSchedule() {
     };
   });
 
-  const sortedCourses = [...courses].sort((a, b) => {
+  const sortedCourses = [...validCourses].sort((a, b) => {
     // Priorité 1: Cours semaine complète
     if (constraints.fullWeek.includes(a.id)) return -1;
     if (constraints.fullWeek.includes(b.id)) return 1;
@@ -779,10 +788,12 @@ function generateReport() {
     report += `Total des heures placées: ${classData.totalHours}h\n`;
     
     Object.values(classData.courses).forEach(course => {
-      if(course.plannedHours > 0){
-      report += `  ${course.name}:\n`;
-      report += `Heures placées: ${course.plannedHours}h\n`;
-      report += `Heures restantes: ${course.remainingHours}h\n`;
+      if(course.totalHours > 0) {
+        report += `  ${course.name}:\n`;
+        const hoursStyle = course.remainingHours > 0 ? '<span class="text-danger">' : '';
+        const hoursEndStyle = course.remainingHours > 0 ? '</span>' : '';
+        report += `    Heures placées: ${course.plannedHours}h\n`;
+        report += `    Heures restantes: ${hoursStyle}${course.remainingHours}h${hoursEndStyle}\n`;
       }
     });
   });
@@ -835,5 +846,9 @@ onMounted(() => {
 .report pre {
   white-space: pre-wrap;
   font-family: monospace;
+}
+
+.text-danger {
+  color: red;
 }
 </style>
