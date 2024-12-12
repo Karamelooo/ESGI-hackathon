@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Layout from "@/layouts/Layout.vue";
+import VLayout from "@/layouts/VLayout.vue";
 import {Carousel, Slide, Pagination, Navigation} from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
 
@@ -51,7 +51,7 @@ const posts = [
 ]
 </script>
 <template>
-  <Layout>
+  <VLayout>
     <Carousel class="mb-8">
       <Slide v-for="slide in events.length" :key="slide">
         <div class="carousel__item h-96 w-full">
@@ -115,5 +115,5 @@ const posts = [
         </li>
       </ol>
     </div>
-  </Layout>
+  </VLayout>
 </template>
