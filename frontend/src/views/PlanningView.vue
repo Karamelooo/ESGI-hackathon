@@ -1,173 +1,125 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 
-// Remplacer les données mockées par des refs qui seront remplies depuis l'API
 const classes = ref([])
 const courses = ref([])
-const weeks = ref([
-  {
-    start: '2025-01-27',
-    end: '2025-01-31'
-  },
-  // ... garder les semaines en dur car c'est du paramétrage
-])
 const salles = ref([])
 const indispos = ref([])
-const intervenants = ref([])
+const weeks = ref([])
 
-// Fonctions pour récupérer les données
-const fetchPromotions = async () => {
-  const response = await fetch('http://localhost:4000/promotions')
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des promotions')
-  }
-  return response.json()
-}
-
-const fetchMatieres = async () => {
-  const response = await fetch('http://localhost:4000/matieres')
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des matières')
-  }
-  return response.json()
-}
-
-const fetchSalles = async () => {
-  const response = await fetch('http://localhost:4000/salles')
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des salles')
-  }
-  return response.json()
-}
-
-const fetchIndisponibilites = async () => {
-  const response = await fetch('http://localhost:4000/indisponibilites')
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des indisponibilités')
-  }
-  return response.json()
-}
-
-const fetchIntervenants = async () => {
-  const response = await fetch('http://localhost:4000/intervenants')
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des intervenants')
-  }
-  return response.json()
-}
-
-const fetchMatiereMapping = async () => {
-  const response = await fetch('http://localhost:4000/matieres-mapping')
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des matiereMapping')
-  }
-  return response.json()
-}
-
-// Chargement des données au montage du composant
-onMounted(async () => {
+async function fetchData() {
   try {
-    const [newPromotions, newMatieres, newSalles, newIndispos, newIntervenants, newMatiereMapping] = await Promise.all([
-      fetchPromotions(),
-      fetchMatieres(),
-      fetchSalles(),
-      fetchIndisponibilites(),
-      fetchIntervenants(),
-      fetchMatiereMapping()
-    ])
-
-    console.log('Promotions reçues:', newPromotions);
-    console.log('Matières reçues:', newMatieres);
-    console.log('Salles reçues:', newSalles);
-    console.log('Indispos reçues:', newIndispos);
-    console.log('Intervenants reçus:', newIntervenants);
-    console.log('MatiereMapping reçus:', newMatiereMapping);
-
-    // Associer les matiereMapping aux matieres
-    newMatieres.forEach(matiere => {
-      matiere.matiereMapping = newMatiereMapping.filter(mapping => mapping.matiereId === matiere.id);
-    });
-
-    if (newPromotions) {
-      classes.value = newPromotions.map(p => ({
-        id: p.id,
-        name: p.name,
-        students: p.students
-      }))
-      console.log('Classes après mapping:', classes.value);
-    }
+    // Récupérer les promotions
+    const promotionsResponse = await fetch('http://localhost:4000/promotions')
+    const promotionsData = await promotionsResponse.json()
+    console.log('Promotions brutes:', promotionsData)
     
-    if (newMatieres) {
-      courses.value = newMatieres.map(m => {
-        const mappings = m.matiereMapping || [];
-        console.log('Mappings pour matière', m.name, ':', mappings);
-        
-        const totalHours = mappings.reduce((sum, mapping) => sum + (mapping.volumeHeure || 0), 0);
-        console.log('Total heures:', totalHours);
-        
-        const teacherMapping = mappings.find(mapping => mapping.intervenantId);
-        const intervenant = intervenants.value.find(int => int.id === teacherMapping?.intervenantId);
-        const teacher = intervenant ? 
-          `${intervenant.firstname} ${intervenant.name}` : 
-          'Pas d\'intervenant';
+    classes.value = promotionsData.map(promotion => ({
+      id: Number(promotion.id),
+      name: promotion.name || 'Sans nom',
+      students: promotion.students || 0
+    }))
+    console.log('Classes transformées:', classes.value)
+
+    // Récupérer les intervenants
+    const intervenantsResponse = await fetch('http://localhost:4000/intervenants')
+    const intervenantsData = await intervenantsResponse.json()
+    console.log('Intervenants bruts:', intervenantsData)
+
+    // D'abord récupérer les matières
+    const matieresResponse = await fetch('http://localhost:4000/matieres')
+    const matieresData = await matieresResponse.json()
+    console.log('Matières brutes:', matieresData)
+
+    // Puis les mappings
+    const matiereMappingsResponse = await fetch('http://localhost:4000/matieres-mapping')
+    const mappingsData = await matiereMappingsResponse.json()
+    console.log('Mappings bruts:', mappingsData)
+
+    courses.value = matieresData
+      .filter(matiere => matiere.name)
+      .map(matiere => {
+        const mapping = mappingsData.find(m => Number(m.matiereId) === Number(matiere.id))
+        const intervenant = mapping ? intervenantsData.find(i => Number(i.id) === Number(mapping.intervenantId)) : null
         
         return {
-          id: m.id,
-          name: m.name,
-          teacher: teacher,
-          hours: totalHours,
-          semester: m.semester,
-          classes: mappings.map(mm => mm.promotionId).filter(Boolean),
-          color: m.color
-        };
-      });
-      console.log('Courses après mapping:', courses.value);
-    }
-    
-    if (newSalles) {
-      salles.value = newSalles.map(s => ({
-        id: s.id,
-        name: s.name,
-        capacity: s.capacity
-      }))
-      console.log('Salles après mapping:', salles.value);
-    }
+          id: Number(matiere.id),
+          name: matiere.name,
+          teacher: intervenant ? 
+            `${intervenant.firstname || ''} ${intervenant.name || ''}`.trim() : 
+            'Enseignant non défini',
+          hours: mapping?.volumeHeure || 0,
+          semester: matiere.semester || 1,
+          classes: mapping ? [Number(mapping.promotionId)] : [],
+          color: matiere.color || '#cccccc'
+        }
+      })
 
-    if (newIntervenants) {
-      intervenants.value = newIntervenants;
-      console.log('Intervenants après assignation:', intervenants.value);
-    }
-    
-    if (newIndispos) {
-      indispos.value = newIndispos.map(i => {
-        const intervenant = intervenants.value.find(int => int.id === i.intervenantId);
-        console.log('Intervenant trouvé pour indispo:', intervenant);
-        
-        const teacherName = intervenant ? 
-          `${intervenant.firstname} ${intervenant.name}` : 
-          `Intervenant ${i.intervenantId}`;
-        
-        return {
-          title: `Indisponibilité - ${teacherName}`,
-          teacherId: i.intervenantId,
-          start: new Date(i.start).toISOString(),
-          end: new Date(i.end).toISOString(),
-          color: '#ff9f89'
-        };
-      });
-      console.log('Indispos après mapping:', indispos.value);
-    }
+    console.log('Cours transformés:', courses.value)
 
-    // Après avoir tout chargé, générer et afficher les événements
-    const events = generateCourseSchedule();
-    console.log('Événements générés:', events);
+    // Récupérer les salles
+    const sallesResponse = await fetch('http://localhost:4000/salles')
+    const sallesData = await sallesResponse.json()
+    salles.value = sallesData.map(salle => ({
+      id: salle.id,
+      name: salle.name || 'Sans nom',
+      capacity: salle.capacite || 0
+    }))
 
-    // Initialiser le calendrier avec les événements
-    initializeCalendar(events);
+    // Récupérer les indisponibilités
+    const indisposResponse = await fetch('http://localhost:4000/indisponibilites')
+    const indisposData = await indisposResponse.json()
+    indispos.value = indisposData.filter(indispo => indispo.intervenant).map(indispo => ({
+      title: `Indisponibilité - ${indispo.intervenant?.firstname || ''} ${indispo.intervenant?.name || ''}`.trim(),
+      teacherId: indispo.intervenantId,
+      start: indispo.start.split('T')[0],
+      end: indispo.end.split('T')[0],
+      color: '#ff9f89'
+    }))
+
+    // Récupérer les périodes
+    const periodesResponse = await fetch('http://localhost:4000/periodes')
+    const periodesData = await periodesResponse.json()
+    weeks.value = periodesData.map(periode => ({
+      start: periode.start.split('T')[0],
+      end: periode.end.split('T')[0]
+    }))
+
+    console.log('Classes:', classes.value)
+    console.log('Courses:', courses.value)
+    console.log('Salles:', salles.value)
+    console.log('Indispos:', indispos.value)
+    console.log('Weeks:', weeks.value)
 
   } catch (error) {
-    console.error('Erreur lors du chargement des données:', error)
+    console.error('Erreur lors de la récupération des données:', error)
   }
+}
+
+// Modifier onMounted pour attendre les données
+onMounted(async () => {
+  await fetchData()
+  const calendarEl = document.getElementById('calendar')
+  const events = generateCourseSchedule()
+  
+  console.log('Événements du calendrier:', JSON.stringify(events, null, 2))
+  
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'multiMonthYear',
+    initialDate: weeks.value[0]?.start || '2025-01-26',
+    editable: true,
+    slotMinTime: '08:00:00',
+    slotMaxTime: '19:00:00',
+    locale: 'fr',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    events: events
+  })
+
+  calendar.render()
 })
 
 const DEFAULT_BLOCK_DURATION = 3.5;
@@ -269,17 +221,27 @@ function checkPrerequisites(courseId, date, events) {
   
   const prereqIds = constraints.prerequisites[courseId];
   for (const prereqId of prereqIds) {
-    const prereqCourse = courses.value.find(c => c.id === prereqId);
-    if (!prereqCourse) continue; // Ignorer si le cours prérequis n'existe pas
-    
+    // Vérifier si le cours prérequis existe
+    const prerequisCourse = courses.value.find(c => c.id === prereqId);
+    if (!prerequisCourse) {
+      console.warn(`Cours prérequis ${prereqId} non trouvé`);
+      return false;
+    }
+
     const prereqEvents = events.filter(event => 
-      event.title.includes(prereqCourse.name)
+      event.title.includes(prerequisCourse.name)
     );
     
-    if (prereqEvents.length === 0) return false;
+    if (prereqEvents.length === 0) {
+      console.log(`Aucun événement trouvé pour le prérequis ${prerequisCourse.name}`);
+      return false;
+    }
     
     const lastPrereqDate = new Date(Math.max(...prereqEvents.map(e => new Date(e.end))));
-    if (date < lastPrereqDate) return false;
+    if (date < lastPrereqDate) {
+      console.log(`Date ${date} antérieure à la fin du prérequis ${prerequisCourse.name} (${lastPrereqDate})`);
+      return false;
+    }
   }
   
   return true;
@@ -547,17 +509,26 @@ function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
 }
 
 function generateReport() {
+  console.log('État des classes:', classes.value)
+  console.log('État du courseTracking:', courseTracking.value)
+  
   let report = '';
   Object.entries(courseTracking.value).forEach(([classId, classData]) => {
-    const classe = classes.value.find(c => c.id === parseInt(classId));
-    if (!classe) return; // Ignorer si la classe n'existe pas
+    const numericClassId = Number(classId);
+    console.log('Traitement de la classe:', { 
+      classId,
+      numericClassId,
+      classes: classes.value,
+      foundClass: classes.value.find(c => c.id === numericClassId)
+    });
     
-    report += `\n${classe.name}:\n`;
+    const className = classes.value.find(c => c.id === numericClassId)?.name || 'Classe inconnue';
+    report += `\n${className}:\n`;
     report += `Total des heures placées: ${classData.totalHours}h\n`;
     
     Object.values(classData.courses).forEach(course => {
-      if (course && course.totalHours > 0) { // Vérifier que course existe
-        report += `  ${course.name}:\n`;
+      if(course.totalHours > 0) {
+        report += `  ${course.name || 'Cours inconnu'}:\n`;
         const hoursStyle = course.remainingHours > 0 ? '<span class="text-danger">' : '';
         const hoursEndStyle = course.remainingHours > 0 ? '</span>' : '';
         report += `    Heures placées: ${course.plannedHours}h\n`;
@@ -566,40 +537,6 @@ function generateReport() {
     });
   });
   return report;
-}
-
-// Déplacer l'initialisation du calendrier dans une fonction séparée
-function initializeCalendar(events) {
-  const calendarEl = document.getElementById('calendar');
-  if (!calendarEl) {
-    console.error("L'élément calendar n'a pas été trouvé");
-    return;
-  }
-
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'multiMonthYear',
-    initialDate: '2025-01-27',
-    editable: false,
-    selectable: true,
-    businessHours: true,
-    dayMaxEvents: true,
-    weekends: false,
-    slotMinTime: '08:00:00',
-    slotMaxTime: '19:00:00',
-    locale: 'fr',
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
-    },
-    events: events,
-    eventDidMount: (info) => {
-      console.log('Événement monté:', info.event.title);
-    }
-  });
-
-  calendar.render();
-  console.log('Calendrier initialisé avec', events.length, 'événements');
 }
 </script>
 
