@@ -4,6 +4,13 @@ import userRoutes from "./routes/userRoutes";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import salleRoutes from "./routes/salleRoutes";
+import matiereRoutes from "./routes/matiereRoutes";
+import promotionRoutes from "./routes/promotionRoutes";
+import matiereMappingRoutes from "./routes/matiereMappingRoutes";
+import intervenantRoutes from "./routes/intervenantRoutes";
+import indisponibiliteRoutes from "./routes/indisponibiliteRoutes";
+import courseRoutes from "./routes/courseRoutes";
+import pauseRoutes from "./routes/pauseRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
@@ -23,6 +30,13 @@ app.use(userRoutes);
 app.use(postRoutes);
 app.use(commentRoutes);
 app.use(salleRoutes);
+app.use(matiereRoutes);
+app.use(promotionRoutes);
+app.use(matiereMappingRoutes);
+app.use(intervenantRoutes);
+app.use(indisponibiliteRoutes);
+app.use(courseRoutes);
+app.use(pauseRoutes);
 
 // test api
 app.get("/", (req: Request, res: Response) => {
