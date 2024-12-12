@@ -15,7 +15,11 @@ export const createCourse = async (req: Request, res: Response) => {
 
 export const getAllCourses = async (_req: Request, res: Response) => {
   try {
-    const courses = await prisma.course.findMany();
+    const courses = await prisma.course.findMany({
+      include: { intervenant: true, Salle: true, matiereMapping: {
+        include: { matiere: true, promotion: true }
+      }, Promotion: true },
+    });
     res.status(200).json(courses);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
@@ -26,6 +30,9 @@ export const getCourseById = async (req: Request, res: Response) => {
   try {
     const course = await prisma.course.findUnique({
       where: { id: req.params.id },
+      include: { intervenant: true, Salle: true, matiereMapping: {
+        include: { matiere: true, promotion: true }
+      }, Promotion: true },
     });
     if (!course){
         res.status(404).json({ message: "Course not found" });
@@ -64,7 +71,10 @@ export const deleteCourse = async (req: Request, res: Response) => {
 export const getCourseIntervenant = async (req: Request, res: Response) => {
   try {
     const courses = await prisma.course.findMany({
-      where: { intervenantId: req.params.intervenantId }
+      where: { intervenantId: req.params.intervenantId },
+      include: { intervenant: true, Salle: true, matiereMapping: {
+        include: { matiere: true, promotion: true }
+      }, Promotion: true },
     });
     res.status(200).json(courses);
   } catch (error) {
