@@ -74,6 +74,7 @@ CREATE TABLE "MatiereMapping" (
     "volumeHeure" INTEGER NOT NULL,
     "matiereId" TEXT NOT NULL,
     "promotionId" TEXT NOT NULL,
+    "intervenantId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -119,6 +120,30 @@ CREATE TABLE "Indisponibilite" (
     CONSTRAINT "Indisponibilite_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Pause" (
+    "id" TEXT NOT NULL,
+    "start" TIMESTAMP(3) NOT NULL,
+    "end" TIMESTAMP(3) NOT NULL,
+    "description" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Pause_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Periode" (
+    "id" TEXT NOT NULL,
+    "start" TIMESTAMP(3) NOT NULL,
+    "end" TIMESTAMP(3) NOT NULL,
+    "promotionId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Periode_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -144,6 +169,9 @@ ALTER TABLE "MatiereMapping" ADD CONSTRAINT "MatiereMapping_matiereId_fkey" FORE
 ALTER TABLE "MatiereMapping" ADD CONSTRAINT "MatiereMapping_promotionId_fkey" FOREIGN KEY ("promotionId") REFERENCES "Promotion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "MatiereMapping" ADD CONSTRAINT "MatiereMapping_intervenantId_fkey" FOREIGN KEY ("intervenantId") REFERENCES "Intervenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Intervenant" ADD CONSTRAINT "Intervenant_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -160,3 +188,6 @@ ALTER TABLE "Course" ADD CONSTRAINT "Course_promotionId_fkey" FOREIGN KEY ("prom
 
 -- AddForeignKey
 ALTER TABLE "Indisponibilite" ADD CONSTRAINT "Indisponibilite_intervenantId_fkey" FOREIGN KEY ("intervenantId") REFERENCES "Intervenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Periode" ADD CONSTRAINT "Periode_promotionId_fkey" FOREIGN KEY ("promotionId") REFERENCES "Promotion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
