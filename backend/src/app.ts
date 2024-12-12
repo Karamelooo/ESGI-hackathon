@@ -12,9 +12,12 @@ import indisponibiliteRoutes from "./routes/indisponibiliteRoutes";
 import courseRoutes from "./routes/courseRoutes";
 import pauseRoutes from "./routes/pauseRoutes";
 import periodeRoutes from "./routes/periodeRoutes";
+import authRoutes from "./routes/authRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
+import prisma from "./prisma/prismaClient";
+import bcrypt from "bcrypt";
 
 const app = express();
 
@@ -39,8 +42,28 @@ app.use(indisponibiliteRoutes);
 app.use(courseRoutes);
 app.use(pauseRoutes);
 app.use(periodeRoutes);
+app.use(authRoutes);
 
-// test api
+async function createSuperAdmin() {
+  const superAdmin = await prisma.user.findFirst({
+    where: { role: 'SUPERADMIN' },
+  });
+
+  if (!superAdmin) {
+    await prisma.user.create({
+      data: {
+        email: 'superadmin@example.com',
+        password: bcrypt.hashSync('securepassword', 10), 
+        role: 'SUPERADMIN',
+        name: 'Super',
+        firstname: 'Admin',
+        address: 'Main Office',
+      },
+    });
+  }
+}
+createSuperAdmin()
+
 app.get("/", (req: Request, res: Response) => {
   try {
     res.status(200).json({ message: "API is working" });
