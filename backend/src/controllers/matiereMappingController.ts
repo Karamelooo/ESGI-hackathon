@@ -3,9 +3,9 @@ import prisma from "../prisma/prismaClient";
 
 export const createMatiereMapping = async (req: Request, res: Response) => {
   try {
-    const { matiereId, promotionId, volumeHeure } = req.body;
+    const { matiereId, promotionId, intervenantId, volumeHeure } = req.body;
     const matiereMapping = await prisma.matiereMapping.create({
-      data: { matiereId, promotionId, volumeHeure },
+      data: { matiereId, promotionId, intervenantId, volumeHeure },
     });
     res.status(201).json(matiereMapping);
   } catch (error) {
