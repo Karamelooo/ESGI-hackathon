@@ -10,6 +10,12 @@
           <option :value="false">Non assigné</option>
           <option :value="true">Assigné</option>
         </select>
+        <select v-if="materiel.assignedBool" v-model="selectedSalleId">
+          <option value="">Sélectionner une salle</option>
+          <option v-for="salle in salles" :key="salle.id" :value="salle.id">
+            {{ salle.name }}
+          </option>
+        </select>
         <button type="submit">{{ materiel.id ? 'Modifier' : 'Ajouter' }}</button>
         <button type="button" v-if="materiel.id" @click="reinitialiserFormulaire">Annuler</button>
       </form>
@@ -33,18 +39,18 @@
 </template>
 
 <script>
-import Toastify from 'toastify-js'
-import "toastify-js/src/toastify.css"
-
+import "toastify-js/src/toastify.css";
+import Toastify from 'toastify-js';
 export default {
+  name: 'MaterielView',
   data() {
     return {
       materiels: [],
+      salles: [],
+      selectedSalleId: '',
       materiel: {
         description: '',
-        assignedBool: false,
-        assignedToId: null,
-        assignedToSalleId: null
+        assignedBool: false
       },
       loading: true,
       error: null
@@ -64,6 +70,19 @@ export default {
         }).showToast();
         return false;
       }
+
+      if (this.materiel.assignedBool && !this.selectedSalleId) {
+        Toastify({
+          text: "Veuillez sélectionner une salle !",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+        return false;
+      }
+
       return true;
     },
 
@@ -80,30 +99,45 @@ export default {
       }
     },
 
+    async chargerSalles() {
+      try {
+        const response = await fetch('http://localhost:4000/salles');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        this.salles = await response.json();
+      } catch (e) {
+        console.error('Erreur:', e);
+        Toastify({
+          text: "Erreur lors du chargement des salles",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        }).showToast();
+      }
+    },
+
     async ajouterMateriel() {
       try {
         if (!this.validateForm()) return;
 
-        const materielExistant = this.materiels.find(m =>
-          m.description.toLowerCase() === this.materiel.description.toLowerCase()
-        );
+        const materielData = {
+          ...this.materiel
+        };
 
-        if (materielExistant) {
-          Toastify({
-            text: "Un matériel avec cette description existe déjà !",
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-          }).showToast();
-          return;
+        if (this.materiel.assignedBool && this.selectedSalleId) {
+          materielData.mapping = {
+            create: {
+              type: 'SALLE',
+              salleId: this.selectedSalleId
+            }
+          };
         }
 
         const response = await fetch('http://localhost:4000/materiels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(this.materiel)
+          body: JSON.stringify(materielData)
         });
 
         if (!response.ok) {
@@ -229,10 +263,9 @@ export default {
     reinitialiserFormulaire() {
       this.materiel = {
         description: '',
-        assignedBool: false,
-        assignedToId: null,
-        assignedToSalleId: null
+        assignedBool: false
       };
+      this.selectedSalleId = '';
     },
 
     async soumettreFormulaire() {
@@ -245,7 +278,10 @@ export default {
   },
 
   async created() {
-    await this.chargerMateriels();
+    await Promise.all([
+      this.chargerMateriels(),
+      this.chargerSalles()
+    ]);
   }
 }
 </script>
@@ -307,5 +343,12 @@ button:hover {
 .error {
   color: red;
   border: 1px solid red;
+}
+
+select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 150px;
 }
 </style>
