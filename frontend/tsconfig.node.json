@@ -7,6 +7,9 @@
     "nightwatch.conf.*",
     "playwright.config.*"
   ],
+  "paths": {
+    "@/*": ["./src/*"]
+  },
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
