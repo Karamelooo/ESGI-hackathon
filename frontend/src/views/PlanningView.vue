@@ -39,23 +39,34 @@ async function fetchData() {
     courses.value = matieresData
       .filter(matiere => matiere.name)
       .map(matiere => {
-        const mapping = mappingsData.find(m => Number(m.matiereId) === Number(matiere.id))
-        const intervenant = mapping ? intervenantsData.find(i => Number(i.id) === Number(mapping.intervenantId)) : null
+        // Trouver tous les mappings pour cette matière
+        const mappings = mappingsData.filter(m => Number(m.matiereId) === Number(matiere.id))
+        console.log(`Mappings pour ${matiere.name}:`, mappings) // Debug
+
+        const courseClasses = mappings.map(m => Number(m.promotionId))
+        console.log(`Classes pour ${matiere.name}:`, courseClasses) // Debug
         
         return {
           id: Number(matiere.id),
           name: matiere.name,
-          teacher: intervenant ? 
-            `${intervenant.firstname || ''} ${intervenant.name || ''}`.trim() : 
-            'Enseignant non défini',
-          hours: mapping?.volumeHeure || 0,
+          teacher: getTeacherFromMappings(mappings, intervenantsData),
+          hours: mappings[0]?.volumeHeure || 0,
           semester: matiere.semester || 1,
-          classes: mapping ? [Number(mapping.promotionId)] : [],
+          classes: courseClasses,
           color: matiere.color || '#cccccc'
         }
       })
 
-    console.log('Cours transformés:', courses.value)
+    console.log('Mappings bruts:', mappingsData)
+    console.log('Cours après transformation:', courses.value.map(c => ({
+      name: c.name,
+      classes: Array.from(c.classes), // Convertir le Proxy en array normal
+      mappings: mappingsData.filter(m => 
+        matieresData.find(mat => 
+          mat.name === c.name && Number(m.matiereId) === Number(mat.id)
+        )
+      )
+    })))
 
     // Récupérer les salles
     const sallesResponse = await fetch('http://localhost:4000/salles')
@@ -90,6 +101,18 @@ async function fetchData() {
     console.log('Salles:', salles.value)
     console.log('Indispos:', indispos.value)
     console.log('Weeks:', weeks.value)
+
+    // Après la transformation des cours
+    console.log('Mappings par classe:', mappingsData.reduce((acc, m) => {
+      acc[m.promotionId] = acc[m.promotionId] || []
+      acc[m.promotionId].push(m)
+      return acc
+    }, {}))
+
+    console.log('Cours avec leurs classes:', courses.value.map(c => ({
+      name: c.name,
+      classes: c.classes
+    })))
 
   } catch (error) {
     console.error('Erreur lors de la récupération des données:', error)
@@ -292,7 +315,6 @@ function scheduleFullWeekCourse(course, classId, currentDate, events, roomSchedu
         markRoomAsOccupied(currentRoom, slot.date, slot.hour, BLOCK_DURATION, roomSchedule);
         markClassAsOccupied(classId, slot.date, slot.hour, BLOCK_DURATION, classSchedule);
         markTeacherAsOccupied(course.teacher, slot.date, slot.hour, BLOCK_DURATION, teacherSchedule);
-        
         courseTracking.value[classId].courses[course.id].plannedHours += BLOCK_DURATION;
         courseTracking.value[classId].courses[course.id].remainingHours -= BLOCK_DURATION;
         courseTracking.value[classId].totalHours += BLOCK_DURATION;
@@ -537,6 +559,15 @@ function generateReport() {
     });
   });
   return report;
+}
+
+// Nouvelle fonction helper
+function getTeacherFromMappings(mappings, intervenantsData) {
+  if (!mappings || mappings.length === 0) return 'Enseignant non défini'
+  const intervenant = intervenantsData.find(i => Number(i.id) === Number(mappings[0].intervenantId))
+  return intervenant ? 
+    `${intervenant.firstname || ''} ${intervenant.name || ''}`.trim() : 
+    'Enseignant non défini'
 }
 </script>
 
