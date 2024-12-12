@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import path from "path";
 import bcrypt from "bcrypt";
 import prisma from "./prisma/prismaClient";
+import cors from "cors";
 import { Prisma } from "@prisma/client";
 
 dotenv.config();
@@ -19,7 +20,7 @@ const app = express();
 app.use(express.json());
 
 // CORS
-app.use(corsMiddleware);
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

@@ -1,11 +1,9 @@
 import express from "express";
-import { login, logout, testAuth } from "../controllers/authController";
-import { authMiddleware, isEtudiant } from "../middlewares/authMiddleware";
+import { login, logout } from "../controllers/authController";
 
 const router = express.Router();
 
-router.get("/login", login);
-router.get("/logout", logout);
-router.get("/testauth", authMiddleware, isEtudiant, testAuth);
+router.post("/login", login);
+router.post("/logout", logout);
 
 export default router;

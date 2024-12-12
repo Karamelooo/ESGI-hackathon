@@ -45,8 +45,3 @@ export async function logout(req: Request, res: Response) {
     res.status(500).json({ message: error.message || 'Erreur lors de la déconnexion' })
   }
 }
-
-
-export const testAuth = (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ message: "oui ???" })
-}
