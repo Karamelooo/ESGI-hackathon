@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { jwt, JwtPayload } from "jsonwebtoken";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import jwt from "jsonwebtoken"
+import { JwtPayload } from "jsonwebtoken";
 import prisma from "../prisma/prismaClient";
 
-
-// Vous pouvez définir une interface pour le request augmentée
 declare global {
   namespace Express {
     interface Request {
@@ -20,15 +19,17 @@ declare global {
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader) {
-    return res.status(401).json({ message: "No token provided." });
+    res.status(401).json({ message: "No token provided." });
+    return;
   }
 
-  const token = authHeader.split(" ")[1]; // Bearer <token>
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ message: "Invalid token format." });
+    res.status(401).json({ message: "Invalid token format." });
+    return;
   }
 
   try {
@@ -36,9 +37,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const decoded = jwt.verify(token, secret) as JwtPayload;
 
     const userId = decoded.userId;
-    
+
     if (!userId) {
-      return res.status(401).json({ message: "Invalid token payload." });
+      res.status(401).json({ message: "Invalid token payload." });
+      return;
     }
 
     const user = await prisma.user.findUnique({
@@ -47,7 +49,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      res.status(404).json({ message: "User not found." });
+      return;
     }
 
     const isEtudiant = user.etudiantId !== null;
@@ -64,7 +67,29 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     next();
   } catch (error) {
+    console.log(token)
     console.error(error);
-    return res.status(401).json({ message: "Unauthorized." });
+    res.status(401).json({ message: "Unauthorized." });
   }
 };
+
+export const isEtudiant = (req: Request, res: Response, next: NextFunction) => {
+  if (req.user && req.user.isEtudiant || req.user?.isSuperAdmin) {
+    next();
+  }
+  res.status(403).json({ message: "Access forbidden: User is not an Etudiant." });
+};
+
+export const isIntervenant = (req: Request, res: Response, next: NextFunction) => {
+  if (req.user && req.user.isIntervenant || req.user?.isSuperAdmin) {
+    next();
+  }
+  res.status(403).json({ message: "Access forbidden: User is not an Intervenant." });
+};
+
+export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (req.user && req.user.isSuperAdmin) {
+    next();
+  }
+  res.status(403).json({ message: "Acces denied: User not superAdmin" });
+}

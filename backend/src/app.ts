@@ -7,6 +7,7 @@ import salleRoutes from "./routes/salleRoutes";
 import authRoutes from "./routes/authRoutes";
 import dotenv from "dotenv";
 import path from "path";
+import bcrypt from "bcrypt";
 import prisma from "./prisma/prismaClient";
 import { Prisma } from "@prisma/client";
 
@@ -38,33 +39,35 @@ app.get("/", (req: Request, res: Response) => {
   }
 });
 
-// const initialisation = async () => {
-//   // initialisation de l'utilisateur superadmin
-//   try {
-//     await prisma.user.upsert({
-//       where: { email: 'user@example.com' },
-//       create: {
-//         lastname: 'Super',
-//         firstname: 'Admin',
-//         email: 'user@example.com',
-//         superAdmin: true
-//       },
-//       update: {},
-//     });
-//   } catch (error) {
-//     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-//       // Handle known errors
-//       if (error.code === 'P2002') {
-//         console.error('Unique constraint violation: A user with this email already exists.');
-//       } else {
-//         console.error(`Prisma error code ${error.code}: ${error.message}`);
-//       }
-//     } else {
-//       console.error(error)
-//     }
-//   }
-// }
+const initialisation = async () => {
+  // initialisation de l'utilisateur superadmin
+  try {
+    const passwordHashed = await bcrypt.hash("admin", 10)
+    await prisma.user.upsert({
+      where: { email: 'user@example.com' },
+      create: {
+        lastname: 'Super',
+        firstname: 'Admin',
+        email: 'user@example.com',
+        superAdmin: true,
+        password: passwordHashed,
+      },
+      update: {},
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // Handle known errors
+      if (error.code === 'P2002') {
+        console.error('Unique constraint violation: A user with this email already exists.');
+      } else {
+        console.error(`Prisma error code ${error.code}: ${error.message}`);
+      }
+    } else {
+      console.error(error)
+    }
+  }
+}
 
-// initialisation()
+initialisation()
 
 export default app;

@@ -4,6 +4,7 @@ CREATE TABLE "User" (
     "lastname" TEXT,
     "firstname" TEXT,
     "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "address" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

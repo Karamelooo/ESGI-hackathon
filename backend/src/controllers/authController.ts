@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import process from 'node:process'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -44,4 +44,9 @@ export async function logout(req: Request, res: Response) {
   catch (error: any) {
     res.status(500).json({ message: error.message || 'Erreur lors de la déconnexion' })
   }
+}
+
+
+export const testAuth = (req: Request, res: Response, next: NextFunction) => {
+  res.status(200).json({ message: "oui ???" })
 }
