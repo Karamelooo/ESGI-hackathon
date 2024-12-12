@@ -1,271 +1,105 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
-const classes = [
-    {
-        id: 1,
-        name: 'Promotion 1',
-        students: 10
-    },
-    {
-        id: 2,
-        name: 'Promotion 2',
-        students: 10
-    },
-    {
-        id: 3,
-        name: 'Promotion 3',
-        students: 10
+// Remplacer les données mockées par des refs qui seront remplies depuis l'API
+const classes = ref([])
+const courses = ref([])
+const weeks = ref([
+  {
+    start: '2025-01-27',
+    end: '2025-01-31'
+  },
+  // ... garder les semaines en dur car c'est du paramétrage
+])
+const salles = ref([])
+const indispos = ref([])
+
+// Fonctions pour récupérer les données
+const fetchPromotions = async () => {
+  const response = await fetch('http://localhost:4000/promotions')
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des promotions')
+  }
+  return response.json()
+}
+
+const fetchMatieres = async () => {
+  const response = await fetch('http://localhost:4000/matieres')
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des matières')
+  }
+  return response.json()
+}
+
+const fetchSalles = async () => {
+  const response = await fetch('http://localhost:4000/salles')
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des salles')
+  }
+  return response.json()
+}
+
+const fetchIndisponibilites = async () => {
+  const response = await fetch('http://localhost:4000/indisponibilite')
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des indisponibilités')
+  }
+  return response.json()
+}
+
+// Chargement des données au montage du composant
+onMounted(async () => {
+  try {
+    const [newPromotions, newMatieres, newSalles, newIndispos] = await Promise.all([
+      fetchPromotions(),
+      fetchMatieres(),
+      fetchSalles(),
+      fetchIndisponibilites()
+    ])
+
+    if (newPromotions) {
+      classes.value = newPromotions.map(p => ({
+        id: p.id,
+        name: p.name,
+        students: 10 // À adapter selon votre modèle
+      }))
     }
-]
+    
+    if (newMatieres) {
+      courses.value = newMatieres.map(m => ({
+        id: m.id,
+        name: m.name,
+        teacher: `${m.intervenant.firstname} ${m.intervenant.name}`,
+        hours: m.matiereMapping[0].volumeHeure,
+        semester: m.semester,
+        classes: m.matiereMapping.map(mm => mm.promotionId),
+        color: m.color
+      }))
+    }
+    
+    if (newSalles) {
+      salles.value = newSalles.map(s => ({
+        id: s.id,
+        name: s.name,
+        capacity: s.capacity
+      }))
+    }
+    
+    if (newIndispos) {
+      indispos.value = newIndispos.map(i => ({
+        title: `Indisponibilité - ${i.intervenant.firstname} ${i.intervenant.name}`,
+        teacherId: i.intervenantId,
+        start: i.startDate,
+        end: i.endDate,
+        color: '#ff9f89'
+      }))
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des données:', error)
+  }
+})
 
 const DEFAULT_BLOCK_DURATION = 3.5;
-
-const courses = [
-  {
-    id: 1,
-    name: 'Développement projet lowcode',
-    teacher: 'Dr. Martin',
-    hours: 14,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#FF6B6B',
-  },
-  {
-    id: 2, 
-    name: 'UX Research avancé',
-    teacher: 'Prof. Bernard',
-    hours: 17.5,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#4ECDC4',
-  },
-  {
-    id: 3, 
-    name: 'Design XR',
-    teacher: 'Prof. Bernard',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#45B7D1',
-  },
-  {
-    id: 4,
-    name: 'Psychologie cognitive et sociologie',
-    teacher: 'Dr. Petit',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#96CEB4',
-  },
-  {
-    id: 5,
-    name: 'Méthodologie et protocole de tests',
-    teacher: 'Prof. Lambert',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#FFEEAD',
-  },
-  {
-    id: 6,
-    name: 'Management de projets design',
-    teacher: 'Dr. Rousseau',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#D4A5A5',
-  },
-  {
-    id: 7,
-    name: 'Veille et innovation',
-    teacher: 'Prof. Moreau',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#9B59B6',
-  },
-  {
-    id: 8,
-    name: 'Culture du design',
-    teacher: 'Dr. Dubois',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#3498DB',
-  },
-  {
-    id: 9,
-    name: 'Projets pratiques et études de cas',
-    teacher: 'Prof. Thomas',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#E67E22',
-  },
-  {
-    id: 10,
-    name: 'Workshop RNCP',
-    teacher: 'Dr. Robert',
-    hours: 3,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#2ECC71',
-  },
-  {
-    id: 11,
-    name: 'Accompagnement mémoires',
-    teacher: 'Prof. Michel',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#F1C40F',
-  },
-  {
-    id: 12,
-    name: 'Anglais S1',
-    teacher: 'Dr. Richard',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#E74C3C',
-  },
-  {
-    id: 13,
-    name: 'Pôle associatif EEMI',
-    teacher: 'Prof. Garcia',
-    hours: 10,
-    semester: 1,
-    classes: [1, 2, 3],
-    color: '#1ABC9C',
-  },
-  {
-    id: 14,
-    name: 'Gamification',
-    teacher: 'Dr. Martinez',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#D35400',
-  },
-  {
-    id: 15,
-    name: 'UI conversationnel',
-    teacher: 'Dr. Simon',
-    hours: 17.5,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#8E44AD',
-  },
-  {
-    id: 16,
-    name: 'Récupération et exploitation de la data pour l\'UX',
-    teacher: 'Prof. Laurent',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#2980B9',
-  },
-  {
-    id: 17,
-    name: 'Propriété intellectuelle et sécurité',
-    teacher: 'Dr. Roux',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#27AE60',
-  },
-  {
-    id: 18,
-    name: 'Eco-conception',
-    teacher: 'Prof. Vincent',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#F39C12',
-  },
-  {
-    id: 19,
-    name: 'Direction artistique',
-    teacher: 'Dr. Leroy',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#C0392B',
-  },
-  {
-    id: 20,
-    name: 'UI Design',
-    teacher: 'Prof. Boyer',
-    hours: 17.5,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#16A085',
-  },
-  {
-    id: 21,
-    name: 'IA ethique',
-    teacher: 'Dr. Leroy',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#7F8C8D',
-  },
-  {
-    id: 22,
-    name: 'Projets pratiques et études de cas',
-    teacher: 'Prof. Michel',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#E67E22',
-  },
-  {
-    id: 23,
-    name: 'Workshop RNCP',
-    teacher: 'Dr. Robert',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#2ECC71',
-  },
-  {
-    id: 24,
-    name: 'Prise de parole en public',
-    teacher: 'Dr. Rousseau',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#BDC3C7',
-  },
-  {
-    id: 25,
-    name: 'Accompagnement mémoires',
-    teacher: 'Prof. Michel',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#F1C40F',
-  },
-  {
-    id: 26,
-    name: 'Anglais S2',
-    teacher: 'Dr. Richard',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#E74C3C',
-  },
-  {
-    id: 27,
-    name: 'Pôle associatif EEMI S2',
-    teacher: 'Prof. Garcia',
-    hours: 10,
-    semester: 2,
-    classes: [1, 2, 3],
-    color: '#1ABC9C',
-  }
-]
 
 function calculateBlockDuration(remainingHours) {
   if (remainingHours >= DEFAULT_BLOCK_DURATION) {
@@ -274,150 +108,8 @@ function calculateBlockDuration(remainingHours) {
   return remainingHours;  // Retourne les heures restantes si < 3.5
 }
 
-const weeks = [
-  {
-    start: '2025-01-27',
-    end: '2025-01-31'
-  },
-  {
-    start: '2025-02-24', 
-    end: '2025-02-28'
-  },
-  {
-    start: '2025-03-25',
-    end: '2025-03-28'
-  },
-  {
-    start: '2025-04-21',
-    end: '2025-04-25'
-  },
-  {
-    start: '2025-05-19',
-    end: '2025-05-23'
-  },
-  {
-    start: '2025-06-16',
-    end: '2025-06-20'
-  },
-  {
-    start: '2025-07-21',
-    end: '2025-07-25'
-  },
-  {
-    start: '2025-09-01',
-    end: '2025-09-05'
-  },
-  {
-    start: '2025-09-08',
-    end: '2025-09-12'
-  },
-  {
-    start: '2025-10-06',
-    end: '2025-10-10'
-  },
-  {
-    start: '2025-11-03',
-    end: '2025-11-07'
-  },
-  {
-    start: '2025-12-01',
-    end: '2025-12-05'
-  }
-]
-
-
-const salles = [
-  {
-    id: 1,
-    name: 'Salle A',
-    capacity: 10
-  },
-  {
-    id: 2, 
-    name: 'Salle B',
-    capacity: 20
-  },
-  {
-    id: 3,
-    name: 'Salle C',
-    capacity: 8
-  },
-  {
-    id: 4,
-    name: 'Salle D',
-    capacity: 30
-  },
-  {
-    id: 5,
-    name: 'Salle E',
-    capacity: 15
-  },
-  {
-    id: 6,
-    name: 'Salle F',
-    capacity: 20
-  },
-  {
-    id: 7,
-    name: 'Salle G',
-    capacity: 25
-  }
-]
-
-const indispos = [
-  {
-    title: 'Indisponibilité - Dr. Martin',
-    teacherId: 1,
-    start: '2025-01-27',
-    end: '2025-01-31',
-    color: '#ff9f89'
-  },
-  {
-    title: 'Indisponibilité - Prof. Dubois',
-    teacherId: 2,
-    start: '2025-08-12', 
-    end: '2025-08-26',
-    color: '#ff9f89'
-  },
-  {
-    title: 'Indisponibilité - Dr. Bernard',
-    teacherId: 3,
-    start: '2025-09-02',
-    end: '2025-09-16', 
-    color: '#ff9f89'
-  },
-  {
-    title: 'Indisponibilité - Prof. Lambert',
-    teacherId: 4,
-    start: '2025-09-16',
-    end: '2025-09-30',
-    color: '#ff9f89'
-  },
-  {
-    title: 'Indisponibilité - Dr. Petit',
-    teacherId: 5,
-    start: '2025-10-07',
-    end: '2025-10-21',
-    color: '#ff9f89'
-  },
-  {
-    title: 'Indisponibilité - Prof. Moreau',
-    teacherId: 6,
-    start: '2025-11-04',
-    end: '2025-11-18',
-    color: '#ff9f89'
-  },
-  {
-    title: 'Indisponibilité - Dr. Rousseau',
-    teacherId: 7,
-    start: '2025-12-02',
-    end: '2025-12-16',
-    color: '#ff9f89'
-  }
-]
-
 function isTeacherAvailable(teacher, date) {
-  return !indispos.some(indispo => {
+  return !indispos.value.some(indispo => {
     if (!indispo.title.includes(teacher)) return false;
     const indispoStart = new Date(indispo.start);
     const indispoEnd = new Date(indispo.end);
@@ -456,12 +148,12 @@ const courseTracking = ref({});
 
 function initializeCourseTracking() {
   courseTracking.value = {};
-  classes.forEach(classe => {
+  classes.value.forEach(classe => {
     courseTracking.value[classe.id] = {
       totalHours: 0,
       courses: {}
     };
-    courses.forEach(course => {
+    courses.value.forEach(course => {
       if (course.classes.includes(classe.id)) {
         courseTracking.value[classe.id].courses[course.id] = {
           name: course.name,
@@ -494,7 +186,7 @@ function checkWeeklyLimit(courseId, date, events) {
   
   const coursesThisWeek = events.filter(event => {
     const eventDate = new Date(event.start);
-    return event.title.includes(courses.find(c => c.id === courseId).name) &&
+    return event.title.includes(courses.value.find(c => c.id === courseId).name) &&
            eventDate >= weekStart && eventDate <= weekEnd;
   });
   
@@ -507,7 +199,7 @@ function checkPrerequisites(courseId, date, events) {
   const prereqIds = constraints.prerequisites[courseId];
   for (const prereqId of prereqIds) {
     const prereqEvents = events.filter(event => 
-      event.title.includes(courses.find(c => c.id === prereqId).name)
+      event.title.includes(courses.value.find(c => c.id === prereqId).name)
     );
     
     if (prereqEvents.length === 0) return false;
@@ -551,7 +243,7 @@ function scheduleFullWeekCourse(course, classId, currentDate, events, roomSchedu
       if (currentRoom) {
         const endHour = Math.floor(slot.hour + BLOCK_DURATION);
         const endMinutes = (BLOCK_DURATION % 1) * 60;
-        const className = classes.find(c => c.id === classId).name;
+        const className = classes.value.find(c => c.id === classId).name;
         
         const event = {
           title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
@@ -605,14 +297,14 @@ function generateCourseSchedule() {
   const teacherSchedule = {};
   
   // Filtrer les cours pour ne garder que ceux qui ont des classes existantes
-  const validCourses = courses.map(course => ({
+  const validCourses = courses.value.map(course => ({
     ...course,
     classes: course.classes.filter(classId => 
-      classes.some(c => c.id === classId)
+      classes.value.some(c => c.id === classId)
     )
   })).filter(course => course.classes.length > 0);
   
-  classes.forEach(classe => {
+  classes.value.forEach(classe => {
     classSchedule[classe.id] = {
       totalHours: 0,
       schedule: {}
@@ -636,9 +328,9 @@ function generateCourseSchedule() {
       let remainingHours = course.hours;
       let weekIndex = 0;
       
-      while (remainingHours > 0 && weekIndex < weeks.length) {
-        let currentDate = new Date(weeks[weekIndex].start);
-        const weekEndDate = new Date(weeks[weekIndex].end);
+      while (remainingHours > 0 && weekIndex < weeks.value.length) {
+        let currentDate = new Date(weeks.value[weekIndex].start);
+        const weekEndDate = new Date(weeks.value[weekIndex].end);
         
         // Vérifier les prérequis avant de planifier
         if (!checkPrerequisites(course.id, currentDate, events)) {
@@ -672,7 +364,7 @@ function generateCourseSchedule() {
                   const endHour = Math.floor(schoolHours.start + blockDuration);
                   const endMinutes = (blockDuration % 1) * 60;
                   
-                  const className = classes.find(c => c.id === classId).name;
+                  const className = classes.value.find(c => c.id === classId).name;
                   
                   const formatTime = (hour) => {
                     const hours = Math.floor(hour);
@@ -749,7 +441,7 @@ function markClassAsOccupied(classId, date, startHour, duration, classSchedule) 
 function findAvailableRoom(date, startHour, roomSchedule) {
   const dateStr = date.toISOString().split('T')[0];
   
-  for (const salle of salles) {
+  for (const salle of salles.value) {
     const roomKey = `${dateStr}-${salle.id}`;
     if (!roomSchedule[roomKey]) {
       roomSchedule[roomKey] = [];
@@ -783,7 +475,7 @@ function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
 function generateReport() {
   let report = '';
   Object.entries(courseTracking.value).forEach(([classId, classData]) => {
-    const className = classes.find(c => c.id === parseInt(classId)).name;
+    const className = classes.value.find(c => c.id === parseInt(classId)).name;
     report += `\n${className}:\n`;
     report += `Total des heures placées: ${classData.totalHours}h\n`;
     
