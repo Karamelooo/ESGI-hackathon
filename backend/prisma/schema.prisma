@@ -13,13 +13,45 @@ datasource db {
 
 model User {
   id          String       @id @default(cuid())
-  name        String
   email       String       @unique
+  password    String
+  role        Role
+  name        String
+  firstname   String
+  address     String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  student     Student?
+  intervenant Intervenant?
   posts       Post[]
   Comment     Comment[]
-  intervenant Intervenant?
+}
+
+enum Role {
+  SUPERADMIN
+  STUDENT
+  INTERVENANT
+  GESTIONNAIRE
+}
+
+model Student {
+  id      String   @id @default(cuid())
+  userId  String   @unique
+  user    User     @relation(fields: [userId], references: [id])
+  courses Course[]
+}
+
+model Intervenant {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  name             String
+  firstname        String
+  courses          Course[]
+  indisponibilites Indisponibilite[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id])
+  MatiereMapping   MatiereMapping[]
 }
 
 model Post {
@@ -92,19 +124,6 @@ model MatiereMapping {
   @@unique([matiereId, promotionId])
 }
 
-model Intervenant {
-  id               String            @id @default(cuid())
-  userId           String            @unique
-  name             String
-  firstname        String
-  courses          Course[]
-  indisponibilites Indisponibilite[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  user             User              @relation(fields: [userId], references: [id])
-  MatiereMapping   MatiereMapping[]
-}
-
 model Course {
   id               String         @id @default(cuid())
   start            DateTime
@@ -119,6 +138,8 @@ model Course {
   updatedAt        DateTime       @updatedAt
   Promotion        Promotion?     @relation(fields: [promotionId], references: [id])
   promotionId      String?
+  Student          Student?       @relation(fields: [studentId], references: [id])
+  studentId        String?
 }
 
 model Indisponibilite {

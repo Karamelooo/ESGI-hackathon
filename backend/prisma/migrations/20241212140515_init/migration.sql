@@ -1,12 +1,39 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('SUPERADMIN', 'STUDENT', 'INTERVENANT', 'GESTIONNAIRE');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" "Role" NOT NULL,
+    "name" TEXT NOT NULL,
+    "firstname" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Student" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "Student_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Intervenant" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "firstname" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Intervenant_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -82,18 +109,6 @@ CREATE TABLE "MatiereMapping" (
 );
 
 -- CreateTable
-CREATE TABLE "Intervenant" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "firstname" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Intervenant_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Course" (
     "id" TEXT NOT NULL,
     "start" TIMESTAMP(3) NOT NULL,
@@ -104,6 +119,7 @@ CREATE TABLE "Course" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "promotionId" TEXT,
+    "studentId" TEXT,
 
     CONSTRAINT "Course_pkey" PRIMARY KEY ("id")
 );
@@ -148,10 +164,19 @@ CREATE TABLE "Periode" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MatiereMapping_matiereId_promotionId_key" ON "MatiereMapping"("matiereId", "promotionId");
+CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Intervenant_userId_key" ON "Intervenant"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MatiereMapping_matiereId_promotionId_key" ON "MatiereMapping"("matiereId", "promotionId");
+
+-- AddForeignKey
+ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Intervenant" ADD CONSTRAINT "Intervenant_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -172,9 +197,6 @@ ALTER TABLE "MatiereMapping" ADD CONSTRAINT "MatiereMapping_promotionId_fkey" FO
 ALTER TABLE "MatiereMapping" ADD CONSTRAINT "MatiereMapping_intervenantId_fkey" FOREIGN KEY ("intervenantId") REFERENCES "Intervenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Intervenant" ADD CONSTRAINT "Intervenant_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Course" ADD CONSTRAINT "Course_salleId_fkey" FOREIGN KEY ("salleId") REFERENCES "Salle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -185,6 +207,9 @@ ALTER TABLE "Course" ADD CONSTRAINT "Course_matiereMappingId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Course" ADD CONSTRAINT "Course_promotionId_fkey" FOREIGN KEY ("promotionId") REFERENCES "Promotion"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Course" ADD CONSTRAINT "Course_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Indisponibilite" ADD CONSTRAINT "Indisponibilite_intervenantId_fkey" FOREIGN KEY ("intervenantId") REFERENCES "Intervenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
