@@ -1,29 +1,73 @@
 <script setup lang="ts">
-import Layout from "@/layouts/Layout.vue";
+import VLayout from "@/layouts/VLayout.vue";
 import VTable from "@/components/VTable.vue";
+import {useUserStore} from '@/stores/userStore';
+import {onMounted, reactive} from "vue";
+import VDrawer from "@/components/VDrawer.vue";
+import type {User} from "@/composables/useUser.ts";
+import FormUser from "@/views/users/FormUsers.vue";
+import {showToast} from "@/utils/taost.ts";
 
-const people = [
-  {name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Étudient'},
-  {name: 'Courtney Henry', title: 'Designer', email: 'courney.henry@gmail.com', role: 'Intervenant'},
-  {name: 'Terry Green', title: 'Designer', email: 'terry.green@myges.fr', role: 'Administrateur'},
-]
+const state = reactive({
+  User: {} as User,
+  openDrawer: false
+});
 
-const columns = [
-  {label: 'Name', key: 'name'},
-  {label: 'Title', key: 'title'},
-  {label: 'Email', key: 'email'},
-  {label: 'Role', key: 'role'}
-]
+const userStore = useUserStore();
+onMounted(async () => {
+  await userStore.loadUsers();
+});
+
+const openAddDrawer = () => {
+  state.User = {} as User;
+  state.openDrawer = true;
+};
+
+const openEditDrawer = (user: User) => {
+  state.User = {...user};
+  state.openDrawer = true;
+};
+
+const handleUserSubmit = async (user: User) => {
+  if (user.id) {
+    await userStore.modifyUser(user);
+  } else {
+    await userStore.createUser(user);
+  }
+  state.openDrawer = false;
+};
+
+const deleteUser = async (user: User) => {
+  console.log('user');
+  if (!user.id) return;
+  await userStore.removeUser(user?.id);
+};
+
 </script>
 <template>
-  <Layout>
+  <VLayout>
+    <VDrawer
+        :title="state.User?.id ? 'Modifier un utilisateur' : 'Ajouter un utilisateur'"
+        :description="state.User?.id ? 'Modifiez les informations de l\'utilisateur' : 'Ajoutez un nouvel utilisateur'"
+        :open="state.openDrawer"
+        :setOpen="(open: boolean) => state.openDrawer = open"
+    >
+      <FormUser
+          :user="state.User"
+          @submit="handleUserSubmit"
+          @cancel="() => state.openDrawer = false"
+      />
+    </VDrawer>
     <VTable
         title="Utilisateurs"
-        :columns="columns"
-        :rows="people"
-        :show-actions="false"
+        :columns="userStore.columns"
+        :rows="userStore.users"
+        :show-actions="true"
         :showAddButton="true"
         addButtonLabel="Ajouter un utilisateur"
+        :onAdd="() => state.openDrawer = true"
+        :onEdit="openEditDrawer"
+        :onDelete="deleteUser"
     />
-  </Layout>
+  </VLayout>
 </template>
