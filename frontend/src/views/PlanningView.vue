@@ -162,6 +162,9 @@ onMounted(async () => {
     const events = generateCourseSchedule();
     console.log('Événements générés:', events);
 
+    // Initialiser le calendrier avec les événements
+    initializeCalendar(events);
+
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)
   }
@@ -266,8 +269,11 @@ function checkPrerequisites(courseId, date, events) {
   
   const prereqIds = constraints.prerequisites[courseId];
   for (const prereqId of prereqIds) {
+    const prereqCourse = courses.value.find(c => c.id === prereqId);
+    if (!prereqCourse) continue; // Ignorer si le cours prérequis n'existe pas
+    
     const prereqEvents = events.filter(event => 
-      event.title.includes(courses.value.find(c => c.id === prereqId).name)
+      event.title.includes(prereqCourse.name)
     );
     
     if (prereqEvents.length === 0) return false;
@@ -543,12 +549,14 @@ function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
 function generateReport() {
   let report = '';
   Object.entries(courseTracking.value).forEach(([classId, classData]) => {
-    const className = classes.value.find(c => c.id === parseInt(classId)).name;
-    report += `\n${className}:\n`;
+    const classe = classes.value.find(c => c.id === parseInt(classId));
+    if (!classe) return; // Ignorer si la classe n'existe pas
+    
+    report += `\n${classe.name}:\n`;
     report += `Total des heures placées: ${classData.totalHours}h\n`;
     
     Object.values(classData.courses).forEach(course => {
-      if(course.totalHours > 0) {
+      if (course && course.totalHours > 0) { // Vérifier que course existe
         report += `  ${course.name}:\n`;
         const hoursStyle = course.remainingHours > 0 ? '<span class="text-danger">' : '';
         const hoursEndStyle = course.remainingHours > 0 ? '</span>' : '';
@@ -560,17 +568,22 @@ function generateReport() {
   return report;
 }
 
-onMounted(() => {
+// Déplacer l'initialisation du calendrier dans une fonction séparée
+function initializeCalendar(events) {
   const calendarEl = document.getElementById('calendar');
-  const events = generateCourseSchedule();
-  
-  console.log('Événements du calendrier:', JSON.stringify(events, null, 2));
-  
+  if (!calendarEl) {
+    console.error("L'élément calendar n'a pas été trouvé");
+    return;
+  }
+
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'multiMonthYear',
-    //initialView: 'dayGridWeek',
-    initialDate: '2025-01-26',
-    editable: true,
+    initialDate: '2025-01-27',
+    editable: false,
+    selectable: true,
+    businessHours: true,
+    dayMaxEvents: true,
+    weekends: false,
     slotMinTime: '08:00:00',
     slotMaxTime: '19:00:00',
     locale: 'fr',
@@ -579,11 +592,15 @@ onMounted(() => {
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
-    events: events
+    events: events,
+    eventDidMount: (info) => {
+      console.log('Événement monté:', info.event.title);
+    }
   });
 
   calendar.render();
-});
+  console.log('Calendrier initialisé avec', events.length, 'événements');
+}
 </script>
 
 <template>
