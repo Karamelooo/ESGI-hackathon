@@ -35,11 +35,6 @@ const router = createRouter({
       component: () => import('../views/ReservationView.vue'),
     },
     {
-      path: '/salles',
-      name: 'salles',
-      component: () => import('../views/SalleView.vue'),
-    },
-    {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
@@ -56,5 +51,17 @@ const router = createRouter({
     }
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('token');
+
+  if (authRequired && !loggedIn) {
+    return next('/login');
+  }
+  next();
+});
+
 
 export default router

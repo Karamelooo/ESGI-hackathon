@@ -6,8 +6,8 @@ import {showToast} from "@/utils/taost.ts";
 export const useUserStore = defineStore('user', () => {
     const users = ref<User[]>([]);
     const columns = [
-        {key: 'id', label: 'ID'},
         {key: 'name', label: 'Nom'},
+        {key: 'firstname', label: 'Prénom'},
         {key: 'email', label: 'Email'},
         {key: 'role', label: 'Rôle'},
     ];
@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
 
     const createUser = async (user: User) => {
         try {
-            const newUser = await addUser(user);
+            const newUser = await addUser(user)
             users.value.push(newUser);
             showToast('Utilisateur ajouté avec succès', 'success');
         } catch (err) {

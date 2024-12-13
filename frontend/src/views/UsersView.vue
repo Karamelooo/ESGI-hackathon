@@ -7,6 +7,7 @@ import VDrawer from "@/components/VDrawer.vue";
 import type {User} from "@/composables/useUser.ts";
 import FormUser from "@/views/users/FormUsers.vue";
 import {showToast} from "@/utils/taost.ts";
+import {onUnmounted} from "@vue/runtime-dom";
 
 const state = reactive({
   User: {} as User,
@@ -38,7 +39,6 @@ const handleUserSubmit = async (user: User) => {
 };
 
 const deleteUser = async (user: User) => {
-  console.log('user');
   if (!user.id) return;
   await userStore.removeUser(user?.id);
 };
@@ -65,7 +65,7 @@ const deleteUser = async (user: User) => {
         :show-actions="true"
         :showAddButton="true"
         addButtonLabel="Ajouter un utilisateur"
-        :onAdd="() => state.openDrawer = true"
+        :onAdd="openAddDrawer"
         :onEdit="openEditDrawer"
         :onDelete="deleteUser"
     />
