@@ -50,6 +50,7 @@ async function fetchData() {
           id: Number(matiere.id),
           name: matiere.name,
           teacher: getTeacherFromMappings(mappings, intervenantsData),
+          teacherId: getTeacherIdFromMappings(mappings, intervenantsData),
           hours: mappings[0]?.volumeHeure || 0,
           semester: matiere.semester || 1,
           classes: courseClasses,
@@ -124,6 +125,7 @@ onMounted(async () => {
   await fetchData()
   const calendarEl = document.getElementById('calendar')
   const events = generateCourseSchedule()
+  const events2 = generateCourseSchedule(2)
   
   console.log('Événements du calendrier:', JSON.stringify(events, null, 2))
   
@@ -357,7 +359,7 @@ function isBetweenPause(heureDebut, heureFin) {
   );
 }
 
-function generateCourseSchedule() {
+function generateCourseSchedule(mode = 0) {
   initializeCourseTracking();
   const events = [];
   let schoolHours = {
@@ -444,15 +446,32 @@ function generateCourseSchedule() {
                     const minutes = Math.round((hour - hours) * 60);
                     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                   };
-                  
-                  const event = {
-                    title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
-                    start: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start)}:00`,
+                  let generatedEvent = null
+                  if(mode === 0) {
+                    generatedEvent = {
+                      title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
+                      start: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start)}:00`,
                     end: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start + blockDuration)}:00`,
-                    color: course.color
-                  };
-                  
-                  events.push(event);
+                      color: course.color
+                    }
+                  }
+                  if(mode === 2) {
+                    generatedEvent = {
+                      id: crypto.randomUUID(),
+                      title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
+                      start: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start)}:00`,
+                      end: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start + blockDuration)}:00`,
+                      intervenantId: course.teacherId,
+                      salleId: currentRoom.id.toString(),
+                      matiereMappingId: course.id.toString(),
+                      promotionId: classId.toString()
+                    }
+                    console.log(generatedEvent)
+                  }
+                  const event = generatedEvent
+                  if(event) {
+                    events.push(event);
+                  }
                   markRoomAsOccupied(currentRoom, currentDate, schoolHours.start, blockDuration, roomSchedule);
                   markClassAsOccupied(classId, currentDate, schoolHours.start, blockDuration, classSchedule);
                   markTeacherAsOccupied(course.teacher, currentDate, schoolHours.start, blockDuration, teacherSchedule);
@@ -583,6 +602,12 @@ function getTeacherFromMappings(mappings, intervenantsData) {
   return intervenant ? 
     `${intervenant.firstname || ''} ${intervenant.name || ''}`.trim() : 
     'Enseignant non défini'
+}
+
+function getTeacherIdFromMappings(mappings, intervenantsData) {
+  if (!mappings || mappings.length === 0) return 'Enseignant non défini'
+  const intervenant = intervenantsData.find(i => Number(i.id) === Number(mappings[0].intervenantId))
+  return intervenant ? intervenant.id : 'Enseignant non défini'
 }
 
 async function saveEventsToDatabase(events) {
