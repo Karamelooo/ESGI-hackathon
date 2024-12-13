@@ -25,9 +25,19 @@ const router = createRouter({
       component: () => import('../views/PromotionsView.vue'),
     },
     {
+      path: '/subjects',
+      name: 'subjects',
+      component: () => import('../views/SubjectsView.vue'),
+    },
+    {
       path: '/materials',
       name: 'material',
       component: () => import('../views/MaterialView.vue'),
+    },
+    {
+      path: '/materiels',
+      name: 'materiels',
+      component: () => import('../views/MaterielView.vue'),
     },
     {
       path: '/users',
@@ -54,11 +64,7 @@ const router = createRouter({
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
     },
-    {
-      path: '/materiels',
-      name: 'materiels',
-      component: () => import('../views/MaterielView.vue'),
-    },
+
   ],
 })
 

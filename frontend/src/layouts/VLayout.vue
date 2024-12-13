@@ -21,6 +21,7 @@ import {
   HomeIcon,
   UsersIcon,
   XMarkIcon,
+  BookmarkIcon
 } from '@heroicons/vue/24/outline'
 import {ChevronDownIcon, MagnifyingGlassIcon} from '@heroicons/vue/20/solid'
 import {useRoute} from "vue-router";
@@ -32,6 +33,7 @@ const navigation = ref([
   {name: 'Users', href: '/users', icon: UsersIcon},
   {name: 'Rooms', href: '/rooms', icon: FolderIcon},
   {name: 'Promotions', href: '/promotions', icon: UsersIcon},
+  {name: 'Matières', href: '/subjects', icon: BookmarkIcon},
   {name: 'Calendar', href: '/calendar', icon: CalendarIcon},
   {name: 'Material', href: '/materials', icon: DocumentDuplicateIcon},
   {name: 'Statistics', href: '/statistics', icon: ChartPieIcon},
@@ -125,8 +127,8 @@ const isActive = (href) => route.fullPath === href;
               <ul role="list" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
                   <RouterLink
-                    :to="item.href"
-                    :class="[isActive(item.href) ? 'bg-gray-50 text-secondary-600' : 'text-gray-700 hover:bg-gray-50 hover:text-secondary-600', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                      :to="item.href"
+                      :class="[isActive(item.href) ? 'bg-gray-50 text-secondary-600' : 'text-gray-700 hover:bg-gray-50 hover:text-secondary-600', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
                     <component :is="item.icon"
                                :class="[isActive(item.href) ? 'text-secondary-600' : 'text-gray-400 group-hover:text-secondary-600', 'size-6 shrink-0']"
                                aria-hidden="true"/>
@@ -137,8 +139,8 @@ const isActive = (href) => route.fullPath === href;
             </li>
             <li class="mt-auto">
               <router-link
-                to="/settings"
-                class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-secondary-600">
+                  to="/settings"
+                  class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-secondary-600">
                 <Cog6ToothIcon class="size-6 shrink-0 text-gray-400 group-hover:text-secondary-600" aria-hidden="true"/>
                 Settings
               </router-link>
@@ -150,7 +152,7 @@ const isActive = (href) => route.fullPath === href;
 
     <div class="lg:pl-72">
       <div
-        class="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+          class="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
         <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="size-6" aria-hidden="true"/>
@@ -195,11 +197,11 @@ const isActive = (href) => route.fullPath === href;
                           leave-from-class="transform opacity-100 scale-100"
                           leave-to-class="transform opacity-0 scale-95">
                 <MenuItems
-                  class="absolute right-0 z-20 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                    class="absolute right-0 z-20 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                   <MenuItem v-for="item in userNavigation" :key="item.name">
                     <RouterLink
-                      :to="item.href"
-                      :class="[isActive(item.href) ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">
+                        :to="item.href"
+                        :class="[isActive(item.href) ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">
                       {{
                         item.name
                       }}
