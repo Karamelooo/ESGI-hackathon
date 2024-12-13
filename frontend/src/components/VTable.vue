@@ -4,7 +4,10 @@ import {Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/vue'
 import {
   EllipsisHorizontalIcon,
 } from '@heroicons/vue/20/solid'
+import {useUser} from "@/composables/useUser.ts";
+import formatDate from "../utils/formatDate.ts";
 
+const user = useUser();
 
 const props = defineProps<{
   title: string;
@@ -57,7 +60,15 @@ const props = defineProps<{
               <tbody class="divide-y divide-gray-200 bg-white">
               <tr v-for="(row, index) in rows" :key="row.id || index">
                 <td v-for="column in columns" :key="column.key" class="py-4 px-3 text-sm text-gray-500">
+                  <span v-if="column.key === 'role'"
+                        :class="user.getRoleColor(row[column.key])">{{ user.getRoleName(row[column.key]) }}
+                  </span>
+                  <span v-else-if="column.key === 'createdAt' || column.key === 'updatedAt'">
+                    {{ formatDate(row[column.key]) }}
+                  </span>
+                  <span v-else>
                   {{ row[column.key] }}
+                  </span>
                 </td>
                 <td v-if="showActions" class="py-4 px-3 text-sm text-gray-500">
                   <Menu as="div">

@@ -18,7 +18,7 @@ model User {
   role        Role
   name        String
   firstname   String
-  address     String
+  address     String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   student     Student?

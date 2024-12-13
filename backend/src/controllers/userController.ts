@@ -13,8 +13,20 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const userData: any = {
+      email,
+      password: hashedPassword,
+      role,
+      name,
+      firstname,
+    };
+
+    if (address) {
+      userData.address = address;
+    }
+
     const user = await prisma.user.create({
-      data: { email, password: hashedPassword, role, name, firstname, address },
+      data: userData,
     });
 
     if (role === "STUDENT") {
@@ -41,7 +53,6 @@ export const createUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: (error as Error).message });
   }
 };
-
 
 
 export const getAllUsers = async (_req: Request, res: Response) => {
