@@ -25,6 +25,7 @@ model User {
   intervenant Intervenant?
   posts       Post[]
   Comment     Comment[]
+  materiels   Materiel[]
 }
 
 enum Role {
@@ -74,17 +75,19 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post   Post @relation(fields: [postId], references: [id])
-  author User @relation(fields: [authorId], references: [id])
+  post      Post       @relation(fields: [postId], references: [id])
+  author    User       @relation(fields: [authorId], references: [id])
+  materiels Materiel[]
 }
 
 model Salle {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String
   capacite  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   Course    Course[]
+  materiels Materiel[]
 }
 
 model Matiere {
@@ -153,12 +156,27 @@ model Indisponibilite {
 }
 
 model Pause {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   start       DateTime
   end         DateTime
   description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  materiels   Materiel[]
+}
+
+model Materiel {
+  id           String    @id @default(cuid())
+  name         String
+  userId       String?
+  salleId      String?
+  assignedBool Boolean   @default(false)
+  user         User?     @relation(fields: [userId], references: [id])
+  salle        Salle?    @relation(fields: [salleId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  pauses       Pause[]
+  comments     Comment[]
 }
 
 model Periode {

@@ -66,6 +66,10 @@ const props = defineProps<{
                   <span v-else-if="column.key === 'createdAt' || column.key === 'updatedAt'">
                     {{ formatDate(row[column.key]) }}
                   </span>
+                  <span v-else-if="column.key === 'color'">
+                    <span class="inline-block w-6 h-6 rounded-full"
+                          :style="{ backgroundColor: row[column.key] }"></span>
+                  </span>
                   <span v-else>
                   {{ row[column.key] }}
                   </span>

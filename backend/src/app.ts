@@ -19,6 +19,7 @@ import path from "path";
 import prisma from "./prisma/prismaClient";
 import bcrypt from "bcrypt";
 
+import materielsRoutes from "./routes/materielsRoutes";
 const app = express();
 
 // JSON
@@ -43,6 +44,7 @@ app.use(courseRoutes);
 app.use(pauseRoutes);
 app.use(periodeRoutes);
 app.use(authRoutes);
+app.use(materielsRoutes);
 
 async function createSuperAdmin() {
   const superAdmin = await prisma.user.findFirst({
@@ -53,7 +55,7 @@ async function createSuperAdmin() {
     await prisma.user.create({
       data: {
         email: 'superadmin@example.com',
-        password: bcrypt.hashSync('securepassword', 10), 
+        password: bcrypt.hashSync('securepassword', 10),
         role: 'SUPERADMIN',
         name: 'Super',
         firstname: 'Admin',
