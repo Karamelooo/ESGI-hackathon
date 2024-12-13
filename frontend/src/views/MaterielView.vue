@@ -5,17 +5,32 @@
     <div class="form-container">
       <h2>{{ materiel.id ? 'Modifier' : 'Ajouter' }} un matériel</h2>
       <form @submit.prevent="soumettreFormulaire">
-        <input v-model="materiel.description" placeholder="Description du matériel" required>
-        <select v-model="materiel.assignedBool">
-          <option :value="false">Non assigné</option>
-          <option :value="true">Assigné</option>
+        <input v-model="materiel.name" placeholder="Description du matériel" required>
+
+        <!-- Sélecteur principal -->
+        <select v-model="typeAssignation" required>
+          <option value="">Sélectionner le type d'assignation</option>
+          <option value="CLASSE">Assigné à une classe</option>
+          <option value="USER">Assigné à un utilisateur</option>
+          <option value="NONE">Non assigné</option>
         </select>
-        <select v-if="materiel.assignedBool" v-model="selectedSalleId">
-          <option value="">Sélectionner une salle</option>
+
+        <!-- Sélecteur de classes -->
+        <select v-if="typeAssignation === 'CLASSE'" v-model="selectedId" required>
+          <option value="">Sélectionner une classe</option>
           <option v-for="salle in salles" :key="salle.id" :value="salle.id">
             {{ salle.name }}
           </option>
         </select>
+
+        <!-- Sélecteur d'utilisateurs -->
+        <select v-if="typeAssignation === 'USER'" v-model="selectedId" required>
+          <option value="">Sélectionner un utilisateur</option>
+          <option v-for="user in users" :key="user.id" :value="user.id">
+            {{ user.name }}
+          </option>
+        </select>
+
         <button type="submit">{{ materiel.id ? 'Modifier' : 'Ajouter' }}</button>
         <button type="button" v-if="materiel.id" @click="reinitialiserFormulaire">Annuler</button>
       </form>
@@ -26,7 +41,7 @@
     <div v-else>
       <ul v-if="materiels.length > 0">
         <li v-for="item in materiels" :key="item.id">
-          {{ item.description }} - Statut: {{ item.assignedBool ? 'Assigné' : 'Non assigné' }}
+          {{ item.name }} - Statut: {{ item.assignedBool ? 'Assigné' : 'Non assigné' }}
           <div class="actions">
             <button @click="modifierMateriel(item)">Modifier</button>
             <button @click="supprimerMateriel(item.id)">Supprimer</button>
@@ -47,9 +62,11 @@ export default {
     return {
       materiels: [],
       salles: [],
-      selectedSalleId: '',
+      users: [],
+      typeAssignation: '', // CLASSE, USER ou NONE
+      selectedId: '',
       materiel: {
-        description: '',
+        name: '',
         assignedBool: false
       },
       loading: true,
@@ -57,9 +74,17 @@ export default {
     }
   },
 
+  watch: {
+    // Réinitialiser selectedId quand le type d'assignation change
+    typeAssignation(newValue) {
+      this.selectedId = '';
+      this.materiel.assignedBool = newValue !== 'NONE';
+    }
+  },
+
   methods: {
     validateForm() {
-      if (!this.materiel.description) {
+      if (!this.materiel.name) {
         Toastify({
           text: "Veuillez saisir une description !",
           duration: 3000,
@@ -71,9 +96,9 @@ export default {
         return false;
       }
 
-      if (this.materiel.assignedBool && !this.selectedSalleId) {
+      if (this.typeAssignation !== 'NONE' && !this.selectedId) {
         Toastify({
-          text: "Veuillez sélectionner une salle !",
+          text: `Veuillez sélectionner ${this.typeAssignation === 'CLASSE' ? 'une classe' : 'un utilisateur'} !`,
           duration: 3000,
           close: true,
           gravity: "top",
@@ -106,33 +131,41 @@ export default {
         this.salles = await response.json();
       } catch (e) {
         console.error('Erreur:', e);
-        Toastify({
-          text: "Erreur lors du chargement des salles",
-          duration: 3000,
-          close: true,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-        }).showToast();
+        this.error = 'Impossible de charger les salles.';
+      }
+    },
+
+    async chargerUsers() {
+      try {
+        const response = await fetch('http://localhost:4000/users');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        this.users = await response.json();
+      } catch (e) {
+        console.error('Erreur:', e);
+        this.error = 'Impossible de charger les utilisateurs.';
       }
     },
 
     async ajouterMateriel() {
       try {
-        if (!this.validateForm()) return;
+        if (this.typeAssignation !== 'NONE' && !this.selectedId) {
+          Toastify({
+            text: `Veuillez sélectionner ${this.typeAssignation === 'CLASSE' ? 'une classe' : 'un utilisateur'} !`,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          }).showToast();
+          return;
+        }
 
         const materielData = {
-          ...this.materiel
+          name: this.materiel.name,
+          assignedBool: this.typeAssignation !== 'NONE',
+          selectedId: this.selectedId,
+          type: this.typeAssignation
         };
-
-        if (this.materiel.assignedBool && this.selectedSalleId) {
-          materielData.mapping = {
-            create: {
-              type: 'SALLE',
-              salleId: this.selectedSalleId
-            }
-          };
-        }
 
         const response = await fetch('http://localhost:4000/materiels', {
           method: 'POST',
@@ -170,16 +203,9 @@ export default {
 
     async mettreAJourMateriel() {
       try {
-        if (!this.validateForm()) return;
-
-        const materielExistant = this.materiels.find(m =>
-          m.description.toLowerCase() === this.materiel.description.toLowerCase() &&
-          m.id !== this.materiel.id
-        );
-
-        if (materielExistant) {
+        if (this.typeAssignation !== 'NONE' && !this.selectedId) {
           Toastify({
-            text: "Un matériel avec cette description existe déjà !",
+            text: `Veuillez sélectionner ${this.typeAssignation === 'CLASSE' ? 'une classe' : 'un utilisateur'} !`,
             duration: 3000,
             close: true,
             gravity: "top",
@@ -189,10 +215,17 @@ export default {
           return;
         }
 
+        const materielData = {
+          name: this.materiel.name,
+          assignedBool: this.typeAssignation !== 'NONE',
+          selectedId: this.selectedId,
+          type: this.typeAssignation
+        };
+
         const response = await fetch(`http://localhost:4000/materiels/${this.materiel.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(this.materiel)
+          body: JSON.stringify(materielData)
         });
 
         if (!response.ok) {
@@ -258,14 +291,22 @@ export default {
 
     modifierMateriel(materiel) {
       this.materiel = { ...materiel };
+      if (materiel.mapping) {
+        this.typeAssignation = materiel.mapping.type;
+        this.selectedId = materiel.mapping.idType;
+      } else {
+        this.typeAssignation = 'NONE';
+        this.selectedId = '';
+      }
     },
 
     reinitialiserFormulaire() {
       this.materiel = {
-        description: '',
+        name: '',
         assignedBool: false
       };
-      this.selectedSalleId = '';
+      this.typeAssignation = '';
+      this.selectedId = '';
     },
 
     async soumettreFormulaire() {
@@ -280,7 +321,8 @@ export default {
   async created() {
     await Promise.all([
       this.chargerMateriels(),
-      this.chargerSalles()
+      this.chargerSalles(),
+      this.chargerUsers()
     ]);
   }
 }

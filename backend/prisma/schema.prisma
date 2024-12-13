@@ -20,6 +20,7 @@ model User {
   posts       Post[]
   Comment     Comment[]
   intervenant Intervenant?
+  materiels Materiel[]
 }
 
 model Post {
@@ -54,6 +55,7 @@ model Salle {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Course    Course[]
+  materiels Materiel[]
 }
 
 model Matiere {
@@ -147,4 +149,6 @@ model Materiel {
   salle     Salle?   @relation(fields: [salleId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  pauses    Pause[]
+  comments  Comment[]
 }
