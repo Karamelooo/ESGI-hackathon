@@ -13,14 +13,46 @@ datasource db {
 
 model User {
   id          String       @id @default(cuid())
-  name        String
   email       String       @unique
+  password    String
+  role        Role
+  name        String
+  firstname   String
+  address     String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  student     Student?
+  intervenant Intervenant?
   posts       Post[]
   Comment     Comment[]
-  intervenant Intervenant?
   materiels   Materiel[]
+}
+
+enum Role {
+  SUPERADMIN
+  STUDENT
+  INTERVENANT
+  GESTIONNAIRE
+}
+
+model Student {
+  id      String   @id @default(cuid())
+  userId  String   @unique
+  user    User     @relation(fields: [userId], references: [id])
+  courses Course[]
+}
+
+model Intervenant {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  name             String
+  firstname        String
+  courses          Course[]
+  indisponibilites Indisponibilite[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id])
+  MatiereMapping   MatiereMapping[]
 }
 
 model Post {
@@ -76,32 +108,23 @@ model Promotion {
   courses   Course[]
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  Periode   Periode[]
 }
 
 model MatiereMapping {
-  id          String    @id @default(cuid())
-  volumeHeure Int
-  matiereId   String
-  promotionId String
-  matiere     Matiere   @relation(fields: [matiereId], references: [id])
-  promotion   Promotion @relation(fields: [promotionId], references: [id])
-  courses     Course[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String      @id @default(cuid())
+  volumeHeure   Int
+  matiereId     String
+  promotionId   String
+  intervenantId String
+  matiere       Matiere     @relation(fields: [matiereId], references: [id])
+  promotion     Promotion   @relation(fields: [promotionId], references: [id])
+  intervenant   Intervenant @relation(fields: [intervenantId], references: [id])
+  courses       Course[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@unique([matiereId, promotionId])
-}
-
-model Intervenant {
-  id               String            @id @default(cuid())
-  userId           String            @unique
-  name             String
-  firstname        String
-  courses          Course[]
-  indisponibilites Indisponibilite[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  user             User              @relation(fields: [userId], references: [id])
 }
 
 model Course {
@@ -118,6 +141,8 @@ model Course {
   updatedAt        DateTime       @updatedAt
   Promotion        Promotion?     @relation(fields: [promotionId], references: [id])
   promotionId      String?
+  Student          Student?       @relation(fields: [studentId], references: [id])
+  studentId        String?
 }
 
 model Indisponibilite {
@@ -152,4 +177,14 @@ model Materiel {
   updatedAt    DateTime  @updatedAt
   pauses       Pause[]
   comments     Comment[]
+}
+
+model Periode {
+  id          String    @id @default(cuid())
+  start       DateTime
+  end         DateTime
+  promotionId String
+  promotion   Promotion @relation(fields: [promotionId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

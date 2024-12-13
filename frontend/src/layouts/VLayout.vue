@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import {ref} from 'vue'
 import {
   Dialog,
@@ -31,6 +31,7 @@ const navigation = ref([
   {name: 'Dashboard', href: '/', icon: HomeIcon},
   {name: 'Users', href: '/users', icon: UsersIcon},
   {name: 'Rooms', href: '/rooms', icon: FolderIcon},
+  {name: 'Promotions', href: '/promotions', icon: UsersIcon},
   {name: 'Calendar', href: '/calendar', icon: CalendarIcon},
   {name: 'Material', href: '/materials', icon: DocumentDuplicateIcon},
   {name: 'Statistics', href: '/statistics', icon: ChartPieIcon},
@@ -49,7 +50,7 @@ const isActive = (href) => route.fullPath === href;
 <template>
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
-      <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
+      <Dialog class="relative z-20 lg:hidden" @close="sidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0"
                          enter-to="opacity-100" leave="transition-opacity ease-linear duration-300"
                          leave-from="opacity-100" leave-to="opacity-0">
@@ -111,7 +112,7 @@ const isActive = (href) => route.fullPath === href;
     </TransitionRoot>
 
     <!-- Static sidebar for desktop -->
-    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
@@ -149,7 +150,7 @@ const isActive = (href) => route.fullPath === href;
 
     <div class="lg:pl-72">
       <div
-        class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        class="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
         <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="size-6" aria-hidden="true"/>
@@ -194,7 +195,7 @@ const isActive = (href) => route.fullPath === href;
                           leave-from-class="transform opacity-100 scale-100"
                           leave-to-class="transform opacity-0 scale-95">
                 <MenuItems
-                  class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                  class="absolute right-0 z-20 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                   <MenuItem v-for="item in userNavigation" :key="item.name">
                     <RouterLink
                       :to="item.href"
