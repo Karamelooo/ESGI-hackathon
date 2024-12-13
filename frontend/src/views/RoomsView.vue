@@ -52,7 +52,7 @@ const deleteRoom = async (room: Room) => {
         :setOpen="(open: boolean) => state.openDrawer = open"
     >
       <FormRoom
-          :user="state.room"
+          :room="state.room"
           @submit="handleUserSubmit"
           @cancel="() => state.openDrawer = false"
       />

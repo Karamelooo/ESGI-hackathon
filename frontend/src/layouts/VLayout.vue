@@ -31,6 +31,7 @@ const navigation = ref([
   {name: 'Dashboard', href: '/', icon: HomeIcon},
   {name: 'Users', href: '/users', icon: UsersIcon},
   {name: 'Rooms', href: '/rooms', icon: FolderIcon},
+  {name: 'Promotions', href: '/promotions', icon: UsersIcon},
   {name: 'Calendar', href: '/calendar', icon: CalendarIcon},
   {name: 'Material', href: '/materials', icon: DocumentDuplicateIcon},
   {name: 'Statistics', href: '/statistics', icon: ChartPieIcon},
