@@ -142,7 +142,7 @@ onMounted(async () => {
         click: async function() {
           if (confirm('Voulez-vous sauvegarder ce planning dans la base de données ?')) {
             try {
-              await saveEventsToDatabase(events)
+              await saveEventsToDatabase(events2)
               alert('Planning sauvegardé avec succès !')
             } catch (error) {
               alert('Erreur lors de la sauvegarde du planning')
@@ -457,7 +457,6 @@ function generateCourseSchedule(mode = 0) {
                   }
                   if(mode === 2) {
                     generatedEvent = {
-                      id: crypto.randomUUID(),
                       title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
                       start: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start)}:00`,
                       end: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start + blockDuration)}:00`,
