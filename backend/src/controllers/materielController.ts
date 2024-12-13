@@ -20,9 +20,18 @@ export const createMateriel = async (req: Request, res: Response) => {
 };
 
 export const updateMateriel = async (req: Request, res: Response) => {
-  const { name, userId, salleId } = req.body;
-  const materiel = await prisma.materiel.update({ where: { id: req.params.id }, data: { name, userId, salleId } });
-  res.status(200).json(materiel);
+  const { name, selectedId, type, assignedBool } = req.body;
+
+  if (type == "CLASSE") {
+    const materiel = await prisma.materiel.update({ where: { id: req.params.id }, data: { salleId: selectedId, assignedBool: assignedBool } });
+    res.status(200).json(materiel);
+  } else if (type == "USER") {
+    const materiel = await prisma.materiel.update({ where: { id: req.params.id }, data: { userId: selectedId, assignedBool: assignedBool } });
+    res.status(200).json(materiel);
+  } else {
+    res.status(404).json({ message: "type non connue" });
+  }
+
 };
 
 export const deleteMateriel = async (req: Request, res: Response) => {
