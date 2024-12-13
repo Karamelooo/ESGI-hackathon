@@ -134,8 +134,23 @@ onMounted(async () => {
     slotMinTime: '08:00:00',
     slotMaxTime: '19:00:00',
     locale: 'fr',
+    customButtons: {
+      saveButton: {
+        text: 'Sauvegarder',
+        click: async function() {
+          if (confirm('Voulez-vous sauvegarder ce planning dans la base de données ?')) {
+            try {
+              await saveEventsToDatabase(events)
+              alert('Planning sauvegardé avec succès !')
+            } catch (error) {
+              alert('Erreur lors de la sauvegarde du planning')
+            }
+          }
+        }
+      }
+    },
     headerToolbar: {
-      left: 'prev,next today',
+      left: 'prev,next today saveButton',
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
@@ -217,7 +232,7 @@ const constraints = {
     1: 1  // cours id 1 (dev projet) limité à 1 fois par semaine
   },
   prerequisites: {
-    15: [20]
+    1: [10] // cours id 1 dépend du cours id 10
   },
   fullWeek: [23, 10]  // cours ids qui doivent occuper une semaine complète (Workshop RNCP)
 }
@@ -568,6 +583,27 @@ function getTeacherFromMappings(mappings, intervenantsData) {
   return intervenant ? 
     `${intervenant.firstname || ''} ${intervenant.name || ''}`.trim() : 
     'Enseignant non défini'
+}
+
+async function saveEventsToDatabase(events) {
+  try {
+    const response = await fetch('http://localhost:4000/courses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ events })
+    })
+
+    if (!response.ok) {
+      throw new Error('Erreur lors de la sauvegarde')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde:', error)
+    throw error
+  }
 }
 </script>
 
