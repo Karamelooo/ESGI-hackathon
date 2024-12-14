@@ -81,3 +81,40 @@ export const getCourseIntervenant = async (req: Request, res: Response) => {
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+export const createMultipleCourses = async (req: Request, res: Response) => {
+  const { courses } = req.body;
+
+  if (!Array.isArray(courses)) {
+    res.status(400).json({ message: "Invalid input, 'courses' must be an array." });
+    return;
+  }
+
+  try {
+    const createdCourses = await prisma.$transaction(
+      courses.map((course) =>
+        prisma.course.create({
+          data: {
+            start: new Date(course.start).toISOString(),
+            end: new Date(course.end).toISOString(),
+            intervenantId: course.intervenantId,
+            salleId: course.salleId,
+            matiereMappingId: course.matiereMappingId,
+            promotionId: course.promotionId,
+          },
+        })
+      )
+    );
+
+    res.status(201).json({
+      message: "Courses created successfully",
+      courses: createdCourses,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      message: (error as Error).message,
+      receivedData: courses,
+      error: error
+    });
+  }
+};

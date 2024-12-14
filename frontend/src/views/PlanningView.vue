@@ -51,6 +51,7 @@ async function fetchData() {
           name: matiere.name,
           teacher: getTeacherFromMappings(mappings, intervenantsData),
           teacherId: getTeacherIdFromMappings(mappings, intervenantsData),
+          matiereMappingId: mappings[0]?.id.toString(), 
           hours: mappings[0]?.volumeHeure || 0,
           semester: matiere.semester || 1,
           classes: courseClasses,
@@ -462,7 +463,7 @@ function generateCourseSchedule(mode = 0) {
                       end: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start + blockDuration)}:00`,
                       intervenantId: course.teacherId,
                       salleId: currentRoom.id.toString(),
-                      matiereMappingId: course.id.toString(),
+                      matiereMappingId: course.matiereMappingId,
                       promotionId: classId.toString()
                     }
                     console.log(generatedEvent)
@@ -609,14 +610,14 @@ function getTeacherIdFromMappings(mappings, intervenantsData) {
   return intervenant ? intervenant.id : 'Enseignant non défini'
 }
 
-async function saveEventsToDatabase(events) {
+async function saveEventsToDatabase(courses) {
   try {
-    const response = await fetch('http://localhost:4000/courses', {
+    const response = await fetch('http://localhost:4000/courses/multiple', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ events })
+      body: JSON.stringify({ courses })
     })
 
     if (!response.ok) {
