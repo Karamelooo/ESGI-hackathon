@@ -69,8 +69,8 @@ async function fetchCourses() {
         slotMinTime: '08:00:00',
         slotMaxTime: '19:00:00',
         locale: 'fr',
-        initialDate: '2025-01-27',
         firstDay: 1,
+        allDaySlot: false,
         buttonText: {
           today: "Aujourd'hui",
           month: 'Mois',
