@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import VLayout from "@/layouts/VLayout.vue";
 
 const classes = ref([])
 const courses = ref([])
@@ -137,6 +138,13 @@ onMounted(async () => {
     slotMinTime: '08:00:00',
     slotMaxTime: '19:00:00',
     locale: 'fr',
+    firstDay: 1,
+      buttonText: {
+        today: "Aujourd'hui",
+        month: 'Mois',
+        week: 'Semaine',
+        day: 'Jour'
+      },
     customButtons: {
       saveButton: {
         text: 'Sauvegarder',
@@ -633,12 +641,14 @@ async function saveEventsToDatabase(courses) {
 </script>
 
 <template>
+  <VLayout>
   <h1>Planning</h1>
   <div id='calendar'></div>
   <div class="report">
     <h2>Rapport des heures de cours</h2>
     <pre>{{ generateReport() }}</pre>
   </div>
+  </VLayout>
 </template>
 
 <style scoped>

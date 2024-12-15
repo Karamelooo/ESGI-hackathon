@@ -91,9 +91,53 @@ export const createMultipleCourses = async (req: Request, res: Response) => {
   }
 
   try {
-    const createdCourses = await prisma.$transaction(
+    const createdCourses = await prisma.$transaction(async (prisma) => {
+      await prisma.course.deleteMany({
+        where: {}
+      });
+
+      return await Promise.all(
+        courses.map((course) =>
+          prisma.course.create({
+            data: {
+              start: new Date(course.start).toISOString(),
+              end: new Date(course.end).toISOString(), 
+              intervenantId: course.intervenantId,
+              salleId: course.salleId,
+              matiereMappingId: course.matiereMappingId,
+              promotionId: course.promotionId,
+            },
+          })
+        )
+      );
+    });
+
+    res.status(201).json({
+      message: "Courses created successfully",
+      courses: createdCourses,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      message: (error as Error).message,
+      receivedData: courses,
+      error: error
+    });
+  }
+};
+
+export const updateMultipleCourses = async (req: Request, res: Response) => {
+  const { courses } = req.body;
+
+  if (!Array.isArray(courses)) {
+    res.status(400).json({ message: "Invalid input, 'courses' must be an array." });
+    return;
+  }
+
+  try {
+    const updatedCourses = await prisma.$transaction(
       courses.map((course) =>
-        prisma.course.create({
+        prisma.course.update({
+          where: { id: course.id },
           data: {
             start: new Date(course.start).toISOString(),
             end: new Date(course.end).toISOString(),
@@ -106,9 +150,9 @@ export const createMultipleCourses = async (req: Request, res: Response) => {
       )
     );
 
-    res.status(201).json({
-      message: "Courses created successfully",
-      courses: createdCourses,
+    res.status(200).json({
+      message: "Courses updated successfully",
+      courses: updatedCourses,
     });
   } catch (error) {
     res.status(500).json({ 
