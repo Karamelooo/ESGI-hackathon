@@ -1,6 +1,10 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import VLayout from "@/layouts/VLayout.vue";
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const selectedPromotion = ref(route.query.promotionId || 'all');
 
 const classes = ref([])
 const courses = ref([])
@@ -8,44 +12,52 @@ const salles = ref([])
 const indispos = ref([])
 const weeks = ref([])
 
-async function fetchData() {
+async function fetchPromotions() {
   try {
-    // Récupérer les promotions
     const promotionsResponse = await fetch('http://localhost:4000/promotions')
     const promotionsData = await promotionsResponse.json()
-    console.log('Promotions brutes:', promotionsData)
     
     classes.value = promotionsData.map(promotion => ({
       id: Number(promotion.id),
       name: promotion.name || 'Sans nom',
       students: promotion.students || 0
     }))
-    console.log('Classes transformées:', classes.value)
+  } catch (error) {
+    console.error('Erreur lors de la récupération des promotions:', error)
+  }
+}
+
+async function fetchData() {
+  try {
+    // Récupérer les promotions
+    const promotionsResponse = await fetch('http://localhost:4000/promotions')
+    const promotionsData = await promotionsResponse.json()
+    
+    classes.value = promotionsData.map(promotion => ({
+      id: Number(promotion.id),
+      name: promotion.name || 'Sans nom',
+      students: promotion.students || 0
+    }))
 
     // Récupérer les intervenants
     const intervenantsResponse = await fetch('http://localhost:4000/intervenants')
     const intervenantsData = await intervenantsResponse.json()
-    console.log('Intervenants bruts:', intervenantsData)
 
     // D'abord récupérer les matières
     const matieresResponse = await fetch('http://localhost:4000/matieres')
     const matieresData = await matieresResponse.json()
-    console.log('Matières brutes:', matieresData)
 
     // Puis les mappings
     const matiereMappingsResponse = await fetch('http://localhost:4000/matieres-mapping')
     const mappingsData = await matiereMappingsResponse.json()
-    console.log('Mappings bruts:', mappingsData)
 
     courses.value = matieresData
       .filter(matiere => matiere.name)
       .map(matiere => {
         // Trouver tous les mappings pour cette matière
         const mappings = mappingsData.filter(m => Number(m.matiereId) === Number(matiere.id))
-        console.log(`Mappings pour ${matiere.name}:`, mappings) // Debug
 
         const courseClasses = mappings.map(m => Number(m.promotionId))
-        console.log(`Classes pour ${matiere.name}:`, courseClasses) // Debug
         
         return {
           id: Number(matiere.id),
@@ -59,17 +71,6 @@ async function fetchData() {
           color: matiere.color || '#cccccc'
         }
       })
-
-    console.log('Mappings bruts:', mappingsData)
-    console.log('Cours après transformation:', courses.value.map(c => ({
-      name: c.name,
-      classes: Array.from(c.classes), // Convertir le Proxy en array normal
-      mappings: mappingsData.filter(m => 
-        matieresData.find(mat => 
-          mat.name === c.name && Number(m.matiereId) === Number(mat.id)
-        )
-      )
-    })))
 
     // Récupérer les salles
     const sallesResponse = await fetch('http://localhost:4000/salles')
@@ -124,6 +125,9 @@ async function fetchData() {
 
 // Modifier onMounted pour attendre les données
 onMounted(async () => {
+  await fetchPromotions();
+  // Récupérer la promotion sélectionnée depuis les paramètres de l'URL
+  selectedPromotion.value = route.query.promotion || 'all';
   await fetchData()
   const calendarEl = document.getElementById('calendar')
   const events = generateCourseSchedule()
@@ -151,21 +155,74 @@ onMounted(async () => {
         click: async function() {
           if (confirm('Voulez-vous sauvegarder ce planning dans la base de données ?')) {
             try {
-              await saveEventsToDatabase(events2)
-              alert('Planning sauvegardé avec succès !')
+              const currentEvents = calendar.getEvents().map(event => ({
+                start: event.start,
+                end: event.end,
+                intervenantId: event.extendedProps?.intervenantId || event._def.extendedProps.intervenantId,
+                salleId: event.extendedProps?.salleId || event._def.extendedProps.salleId,
+                matiereMappingId: event.extendedProps?.matiereMappingId || event._def.extendedProps.matiereMappingId,
+                promotionId: event.extendedProps?.promotionId || event._def.extendedProps.promotionId
+              }));
+
+              await saveEventsToDatabase(currentEvents);
+              alert('Planning sauvegardé avec succès !');
             } catch (error) {
-              alert('Erreur lors de la sauvegarde du planning')
+              console.error('Erreur lors de la sauvegarde:', error);
+              alert('Erreur lors de la sauvegarde du planning');
             }
           }
         }
       }
     },
     headerToolbar: {
-      left: 'prev,next today saveButton',
+      left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      right: 'saveButton dayGridMonth,timeGridWeek,timeGridDay'
     },
-    events: events
+    eventDrop: (info) => {
+      // update lors du déplacement d'un événement
+      const updatedEvent = info.event;
+      const eventIndex = events2.findIndex(e => {
+        return e.start === updatedEvent.startStr && 
+               e.title === updatedEvent.title;
+      });
+      
+      if (eventIndex !== -1) {
+        events2[eventIndex] = {
+          ...events2[eventIndex],
+          start: updatedEvent.startStr,
+          end: updatedEvent.endStr
+        };
+      }
+    },
+    
+    eventResize: (info) => {
+      // update lors du redimensionnement d'un événement
+      const updatedEvent = info.event;
+      const eventIndex = events2.findIndex(e => {
+        return e.start === updatedEvent.startStr && 
+               e.title === updatedEvent.title;
+      });
+      
+      if (eventIndex !== -1) {
+        events2[eventIndex] = {
+          ...events2[eventIndex],
+          start: updatedEvent.startStr,
+          end: updatedEvent.endStr
+        };
+      }
+    },
+
+    events: events2.map(event => ({
+      ...event,
+      color: event.color,
+      extendedProps: {
+        intervenantId: event.intervenantId,
+        salleId: event.salleId,
+        matiereMappingId: event.matiereMappingId,
+        promotionId: event.promotionId
+      }
+    }))
   })
 
   calendar.render()
@@ -220,20 +277,33 @@ const courseTracking = ref({});
 
 function initializeCourseTracking() {
   courseTracking.value = {};
-  classes.value.forEach(classe => {
+  
+  // filtrer les classes en fonction de la promotion sélectionnée
+  const filteredClasses = selectedPromotion.value === 'all' 
+    ? classes.value 
+    : classes.value.filter(c => String(c.id) === String(selectedPromotion.value));
+  
+  console.log('Selected Promotion:', selectedPromotion.value);
+  console.log('Filtered Classes:', filteredClasses);
+  
+  filteredClasses.forEach(classe => {
     courseTracking.value[classe.id] = {
       totalHours: 0,
       courses: {}
     };
-    courses.value.forEach(course => {
-      if (course.classes.includes(classe.id)) {
-        courseTracking.value[classe.id].courses[course.id] = {
-          name: course.name,
-          plannedHours: 0,
-          totalHours: course.hours,
-          remainingHours: course.hours
-        };
-      }
+    
+    // filtrer les cours selon la classe
+    const classeCourses = courses.value.filter(course => 
+      course.classes.includes(classe.id)
+    );
+    
+    classeCourses.forEach(course => {
+      courseTracking.value[classe.id].courses[course.id] = {
+        name: course.name,
+        plannedHours: 0,
+        totalHours: course.hours,
+        remainingHours: course.hours
+      };
     });
   });
 }
@@ -380,15 +450,21 @@ function generateCourseSchedule(mode = 0) {
   const classSchedule = {};
   const teacherSchedule = {};
   
-  // Filtrer les cours pour ne garder que ceux qui ont des classes existantes
+  // Filtrer les classes selon la promotion sélectionnée
+  const filteredClasses = selectedPromotion.value === 'all' 
+    ? classes.value 
+    : classes.value.filter(c => String(c.id) === String(selectedPromotion.value));
+
+  // Filtrer les cours pour ne garder que ceux qui ont des classes existantes et sélectionnées
   const validCourses = courses.value.map(course => ({
     ...course,
     classes: course.classes.filter(classId => 
-      classes.value.some(c => c.id === classId)
+      filteredClasses.some(c => c.id === classId)
     )
   })).filter(course => course.classes.length > 0);
-  
-  classes.value.forEach(classe => {
+
+  // Initialiser le suivi des cours uniquement pour les classes filtrées
+  filteredClasses.forEach(classe => {
     classSchedule[classe.id] = {
       totalHours: 0,
       schedule: {}
@@ -469,12 +545,12 @@ function generateCourseSchedule(mode = 0) {
                       title: `${course.name} - ${course.teacher} (${currentRoom.name}) - ${className}`,
                       start: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start)}:00`,
                       end: `${currentDate.toISOString().split('T')[0]}T${formatTime(schoolHours.start + blockDuration)}:00`,
-                      intervenantId: course.teacherId,
+                      color: course.color,
+                      intervenantId: course.teacherId.toString(),
                       salleId: currentRoom.id.toString(),
                       matiereMappingId: course.matiereMappingId,
                       promotionId: classId.toString()
                     }
-                    console.log(generatedEvent)
                   }
                   const event = generatedEvent
                   if(event) {
@@ -572,37 +648,6 @@ function markRoomAsOccupied(room, date, startHour, duration, roomSchedule) {
   });
 }
 
-function generateReport() {
-  console.log('État des classes:', classes.value)
-  console.log('État du courseTracking:', courseTracking.value)
-  
-  let report = '';
-  Object.entries(courseTracking.value).forEach(([classId, classData]) => {
-    const numericClassId = Number(classId);
-    console.log('Traitement de la classe:', { 
-      classId,
-      numericClassId,
-      classes: classes.value,
-      foundClass: classes.value.find(c => c.id === numericClassId)
-    });
-    
-    const className = classes.value.find(c => c.id === numericClassId)?.name || 'Classe inconnue';
-    report += `\n${className}:\n`;
-    report += `Total des heures placées: ${classData.totalHours}h\n`;
-    
-    Object.values(classData.courses).forEach(course => {
-      if(course.totalHours > 0) {
-        report += `  ${course.name || 'Cours inconnu'}:\n`;
-        const hoursStyle = course.remainingHours > 0 ? '<span class="text-danger">' : '';
-        const hoursEndStyle = course.remainingHours > 0 ? '</span>' : '';
-        report += `    Heures placées: ${course.plannedHours}h\n`;
-        report += `    Heures restantes: ${hoursStyle}${course.remainingHours}h${hoursEndStyle}\n`;
-      }
-    });
-  });
-  return report;
-}
-
 // Nouvelle fonction helper
 function getTeacherFromMappings(mappings, intervenantsData) {
   if (!mappings || mappings.length === 0) return 'Enseignant non défini'
@@ -618,53 +663,197 @@ function getTeacherIdFromMappings(mappings, intervenantsData) {
   return intervenant ? intervenant.id : 'Enseignant non défini'
 }
 
-async function saveEventsToDatabase(courses) {
+async function saveEventsToDatabase(eventsData) {
   try {
-    const response = await fetch('http://localhost:4000/courses/multiple', {
+    const promotionId = route.query.promotion;
+    const response = await fetch(`http://localhost:4000/courses/multiple?promotionId=${promotionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ courses })
-    })
+      body: JSON.stringify({ 
+        courses: eventsData
+      })
+    });
 
     if (!response.ok) {
-      throw new Error('Erreur lors de la sauvegarde')
+      throw new Error('Erreur lors de la sauvegarde');
     }
 
-    return await response.json()
+    return await response.json();
   } catch (error) {
-    console.error('Erreur lors de la sauvegarde:', error)
-    throw error
+    console.error('Erreur lors de la sauvegarde:', error);
+    throw error;
   }
 }
 </script>
 
 <template>
   <VLayout>
-  <h1>Planning</h1>
-  <div id='calendar'></div>
-  <div class="report">
-    <h2>Rapport des heures de cours</h2>
-    <pre>{{ generateReport() }}</pre>
-  </div>
+    <div class="planning-container">
+      <div class="header">
+        <h1 class="text-base font-semibold text-gray-900">Génération du planning</h1>
+      </div>
+      <div class="main-content">
+        <div class="left-column">
+          <div class="stats-section">
+            <h3>Statistiques</h3>
+            <div 
+              v-for="(tracking, classId) in courseTracking" 
+              :key="classId" 
+              class="stats-card"
+            >
+              <h4>{{ classes.find(c => c.id === Number(classId))?.name }}</h4>
+              <div class="stats-details">
+                <p>Total des heures : {{ tracking.totalHours }}h</p>
+                <div 
+                  v-for="(course, courseId) in tracking.courses" 
+                  :key="courseId" 
+                  class="course-stat"
+                  :class="{ 'incomplete': course.plannedHours < course.totalHours }"
+                >
+                  <span>{{ course.name }}</span>
+                  <span>{{ course.plannedHours }}/{{ course.totalHours }}h</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right-column">
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
   </VLayout>
 </template>
 
 <style scoped>
-.report {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #f5f5f5;
+.planning-container {
+  padding: 20px;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 24px;
+  border: none;
   border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.report pre {
-  white-space: pre-wrap;
-  font-family: monospace;
+.save-button:hover {
+  background-color: #45a049;
 }
 
-.text-danger {
-  color: red;
+.main-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  height: calc(100vh - 120px);
+}
+
+.left-column {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stats-section {
+  background-color: white;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.stats-card {
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.stats-details {
+  font-size: 14px;
+}
+
+.course-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.course-stat.incomplete {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.right-column {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: auto;
+}
+
+#calendar {
+  height: 100%;
+}
+
+h1 {
+  color: #333;
+  margin: 0;
+}
+
+h3 {
+  color: #444;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+h4 {
+  color: #555;
+  margin: 0 0 10px 0;
+}
+
+:deep(.fc-saveButton-button) {
+  background-color: #4CAF50 !important;
+  border-color: #4CAF50 !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  transition: background-color 0.3s !important;
+}
+
+:deep(.fc-saveButton-button:hover) {
+  background-color: #45a049 !important;
+  border-color: #45a049 !important;
+}
+
+:deep(.fc-header-toolbar) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+:deep(.fc-toolbar-chunk:last-child) {
+  display: flex;
+  gap: 8px;
 }
 </style>

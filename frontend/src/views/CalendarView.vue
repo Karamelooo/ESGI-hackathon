@@ -10,7 +10,10 @@ const selectedPromotion = ref('all')
 const calendar = ref(null)
 
 function goToPlanningView() {
-  router.push('/planning');
+  router.push({
+    path: '/planning',
+    query: { promotion: selectedPromotion.value }
+  });
 }
 
 async function fetchPromotions() {
@@ -66,6 +69,7 @@ async function fetchCourses() {
         slotMinTime: '08:00:00',
         slotMaxTime: '19:00:00',
         locale: 'fr',
+        initialDate: '2025-01-27',
         firstDay: 1,
         buttonText: {
           today: "Aujourd'hui",
@@ -145,7 +149,7 @@ onMounted(async () => {
   <VLayout>
     <div class="calendar-container">
       <div class="header-container">
-        <h1>Emploi du temps</h1>
+        <h1 class="text-base font-semibold text-gray-900">Emploi du temps</h1>
         <div class="button-group">
           <button @click="saveCalendarChanges" class="save-button">
             Sauvegarder

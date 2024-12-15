@@ -84,6 +84,7 @@ export const getCourseIntervenant = async (req: Request, res: Response) => {
 
 export const createMultipleCourses = async (req: Request, res: Response) => {
   const { courses } = req.body;
+  const promotionId = req.query.promotionId as string;
 
   if (!Array.isArray(courses)) {
     res.status(400).json({ message: "Invalid input, 'courses' must be an array." });
@@ -92,9 +93,15 @@ export const createMultipleCourses = async (req: Request, res: Response) => {
 
   try {
     const createdCourses = await prisma.$transaction(async (prisma) => {
-      await prisma.course.deleteMany({
-        where: {}
-      });
+      if (promotionId && promotionId !== 'all') {
+        await prisma.course.deleteMany({
+          where: {
+            promotionId: promotionId
+          }
+        });
+      } else {
+        await prisma.course.deleteMany({});
+      }
 
       return await Promise.all(
         courses.map((course) =>
@@ -119,7 +126,6 @@ export const createMultipleCourses = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ 
       message: (error as Error).message,
-      receivedData: courses,
       error: error
     });
   }
