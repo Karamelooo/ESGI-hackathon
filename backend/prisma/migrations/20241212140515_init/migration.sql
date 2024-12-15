@@ -149,7 +149,6 @@ CREATE TABLE "Pause" (
 );
 
 -- CreateTable
-<<<<<<<< HEAD:backend/prisma/migrations/20241213112321_/migration.sql
 CREATE TABLE "Materiel" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -159,6 +158,18 @@ CREATE TABLE "Materiel" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Materiel_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Periode" (
+    "id" TEXT NOT NULL,
+    "start" TIMESTAMP(3) NOT NULL,
+    "end" TIMESTAMP(3) NOT NULL,
+    "promotionId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Periode_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -175,17 +186,6 @@ CREATE TABLE "_MaterielToPause" (
     "B" TEXT NOT NULL,
 
     CONSTRAINT "_MaterielToPause_AB_pkey" PRIMARY KEY ("A","B")
-========
-CREATE TABLE "Periode" (
-    "id" TEXT NOT NULL,
-    "start" TIMESTAMP(3) NOT NULL,
-    "end" TIMESTAMP(3) NOT NULL,
-    "promotionId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Periode_pkey" PRIMARY KEY ("id")
->>>>>>>> origin/main:backend/prisma/migrations/20241212140515_init/migration.sql
 );
 
 -- CreateIndex
@@ -198,12 +198,6 @@ CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
 CREATE UNIQUE INDEX "Intervenant_userId_key" ON "Intervenant"("userId");
 
 -- CreateIndex
-<<<<<<<< HEAD:backend/prisma/migrations/20241213112321_/migration.sql
-CREATE INDEX "_CommentToMateriel_B_index" ON "_CommentToMateriel"("B");
-
--- CreateIndex
-CREATE INDEX "_MaterielToPause_B_index" ON "_MaterielToPause"("B");
-========
 CREATE UNIQUE INDEX "MatiereMapping_matiereId_promotionId_key" ON "MatiereMapping"("matiereId", "promotionId");
 
 -- AddForeignKey
@@ -211,7 +205,6 @@ ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Intervenant" ADD CONSTRAINT "Intervenant_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
->>>>>>>> origin/main:backend/prisma/migrations/20241212140515_init/migration.sql
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -250,11 +243,13 @@ ALTER TABLE "Course" ADD CONSTRAINT "Course_studentId_fkey" FOREIGN KEY ("studen
 ALTER TABLE "Indisponibilite" ADD CONSTRAINT "Indisponibilite_intervenantId_fkey" FOREIGN KEY ("intervenantId") REFERENCES "Intervenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-<<<<<<<< HEAD:backend/prisma/migrations/20241213112321_/migration.sql
 ALTER TABLE "Materiel" ADD CONSTRAINT "Materiel_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Materiel" ADD CONSTRAINT "Materiel_salleId_fkey" FOREIGN KEY ("salleId") REFERENCES "Salle"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Periode" ADD CONSTRAINT "Periode_promotionId_fkey" FOREIGN KEY ("promotionId") REFERENCES "Promotion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CommentToMateriel" ADD CONSTRAINT "_CommentToMateriel_A_fkey" FOREIGN KEY ("A") REFERENCES "Comment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -267,6 +262,3 @@ ALTER TABLE "_MaterielToPause" ADD CONSTRAINT "_MaterielToPause_A_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "_MaterielToPause" ADD CONSTRAINT "_MaterielToPause_B_fkey" FOREIGN KEY ("B") REFERENCES "Pause"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-========
-ALTER TABLE "Periode" ADD CONSTRAINT "Periode_promotionId_fkey" FOREIGN KEY ("promotionId") REFERENCES "Promotion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
->>>>>>>> origin/main:backend/prisma/migrations/20241212140515_init/migration.sql
