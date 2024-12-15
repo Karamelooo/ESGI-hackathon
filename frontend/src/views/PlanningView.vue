@@ -137,12 +137,13 @@ onMounted(async () => {
   
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'multiMonthYear',
-    initialDate: weeks.value[0]?.start || '2025-01-26',
+    initialDate: weeks.value[0]?.start || '2025-01-01',
     editable: true,
     slotMinTime: '08:00:00',
     slotMaxTime: '19:00:00',
     locale: 'fr',
     firstDay: 1,
+    allDaySlot: false,
       buttonText: {
         today: "Aujourd'hui",
         month: 'Mois',
