@@ -9,13 +9,42 @@ Arthur VALENTIM @Valentin460
 
 # Procédure d’installation et de lancement de votre solution
 
-  - Dans le répertoire `frontend`, exécuter la commande suivante :
+- Dans le répertoire `frontend`, exécuter la commande suivante :
 ```
 npm i
  ```
 
-   - Dans le répertoire racine, exécuter la commande suivante :
+- Dans le répertoire racine, ajouter un .env ; exemple :
+
+```.env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=postgres
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres?schema=public
+JWT_SECRET=ceci-est-une-cle-secrete
+FRONTEND_PORT=3000
+BACKEND_PORT=4000
+DB_PORT=5432
+  ```
+
+- Dans le répertoire backend, ajouter un .env ; exemple :
+
 ```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres?schema=public
+JWT_SECRET=ceci-est-une-cle-secrete
+```
+
+- Dans `app.ts`, commenter les lignes 34 à 47 afin de créer le superadmin
+
+- Dans le répertoire racine, exécuter la commande suivante :
+```
+docker compose up
+```
+
+- Une fois exécuté, décommenter les lignes 34 à 47 dans àpp.ts`, puis redémarrer les containers avec la commande suivante :
+
+```
+docker compose down
 docker compose up
 ```
 
