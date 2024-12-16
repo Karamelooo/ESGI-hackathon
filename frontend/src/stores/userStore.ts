@@ -5,6 +5,7 @@ import {showToast} from "@/utils/taost.ts";
 
 export const useUserStore = defineStore('user', () => {
     const users = ref<User[]>([]);
+    const intervenants = ref<User[]>([]);
     const columns = [
         {key: 'name', label: 'Nom'},
         {key: 'firstname', label: 'Prénom'},
@@ -14,7 +15,7 @@ export const useUserStore = defineStore('user', () => {
     const loading = ref<boolean>(false);
     const error = ref<string | null>(null);
 
-    const {fetchUsers, addUser, updateUser, deleteUser} = useUser();
+    const {fetchUsers, addUser, updateUser, deleteUser, fetchIntervenants} = useUser();
 
     const loadUsers = async () => {
         loading.value = true;
@@ -28,6 +29,17 @@ export const useUserStore = defineStore('user', () => {
         }
     };
 
+    const loadIntervenants = async () => {
+        loading.value = true;
+        error.value = null;
+        try {
+            intervenants.value = await fetchIntervenants();
+        } catch (err) {
+            error.value = (err as Error).message;
+        } finally {
+            loading.value = false;
+        }
+    };
     const createUser = async (user: User) => {
         try {
             const newUser = await addUser(user)
@@ -66,6 +78,7 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         users,
+        intervenants,
         columns,
         loading,
         error,
@@ -73,5 +86,6 @@ export const useUserStore = defineStore('user', () => {
         createUser,
         modifyUser,
         removeUser,
+        loadIntervenants
     };
 });

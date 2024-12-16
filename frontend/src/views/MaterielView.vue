@@ -1,63 +1,68 @@
 <template>
-  <div>
-    <h1>Gestion des Matériels</h1>
+  <VLayout>
+    <div>
+      <h1>Gestion des Matériels</h1>
 
-    <div class="form-container">
-      <h2>{{ materiel.id ? 'Modifier' : 'Ajouter' }} un matériel</h2>
-      <form @submit.prevent="soumettreFormulaire">
-        <input v-model="materiel.name" placeholder="Description du matériel" required>
+      <div class="form-container">
+        <h2>{{ materiel.id ? 'Modifier' : 'Ajouter' }} un matériel</h2>
+        <form @submit.prevent="soumettreFormulaire">
+          <input v-model="materiel.name" placeholder="Description du matériel" required>
 
-        <!-- Sélecteur principal -->
-        <select v-model="typeAssignation" required>
-          <option value="">Sélectionner le type d'assignation</option>
-          <option value="CLASSE">Assigné à une classe</option>
-          <option value="USER">Assigné à un utilisateur</option>
-          <option value="NONE">Non assigné</option>
-        </select>
+          <!-- Sélecteur principal -->
+          <select v-model="typeAssignation" required>
+            <option value="">Sélectionner le type d'assignation</option>
+            <option value="CLASSE">Assigné à une classe</option>
+            <option value="USER">Assigné à un utilisateur</option>
+            <option value="NONE">Non assigné</option>
+          </select>
 
-        <!-- Sélecteur de classes -->
-        <select v-if="typeAssignation === 'CLASSE'" v-model="selectedId" required>
-          <option value="">Sélectionner une classe</option>
-          <option v-for="salle in salles" :key="salle.id" :value="salle.id">
-            {{ salle.name }}
-          </option>
-        </select>
+          <!-- Sélecteur de classes -->
+          <select v-if="typeAssignation === 'CLASSE'" v-model="selectedId" required>
+            <option value="">Sélectionner une classe</option>
+            <option v-for="salle in salles" :key="salle.id" :value="salle.id">
+              {{ salle.name }}
+            </option>
+          </select>
 
-        <!-- Sélecteur d'utilisateurs -->
-        <select v-if="typeAssignation === 'USER'" v-model="selectedId" required>
-          <option value="">Sélectionner un utilisateur</option>
-          <option v-for="user in users" :key="user.id" :value="user.id">
-            {{ user.name }}
-          </option>
-        </select>
+          <!-- Sélecteur d'utilisateurs -->
+          <select v-if="typeAssignation === 'USER'" v-model="selectedId" required>
+            <option value="">Sélectionner un utilisateur</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.name }}
+            </option>
+          </select>
 
-        <button type="submit">{{ materiel.id ? 'Modifier' : 'Ajouter' }}</button>
-        <button type="button" v-if="materiel.id" @click="reinitialiserFormulaire">Annuler</button>
-      </form>
+          <button type="submit">{{ materiel.id ? 'Modifier' : 'Ajouter' }}</button>
+          <button type="button" v-if="materiel.id" @click="reinitialiserFormulaire">Annuler</button>
+        </form>
+      </div>
+
+      <div v-if="loading" class="loading">Chargement...</div>
+      <div v-else-if="error" class="error">{{ error }}</div>
+      <div v-else>
+        <ul v-if="materiels.length > 0">
+          <li v-for="item in materiels" :key="item.id">
+            {{ item.name }} - Statut: {{ item.assignedBool ? 'Assigné' : 'Non assigné' }}
+            <div class="actions">
+              <button @click="modifierMateriel(item)">Modifier</button>
+              <button @click="supprimerMateriel(item.id)">Supprimer</button>
+            </div>
+          </li>
+        </ul>
+        <p v-else>Aucun matériel disponible</p>
+      </div>
     </div>
-
-    <div v-if="loading" class="loading">Chargement...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else>
-      <ul v-if="materiels.length > 0">
-        <li v-for="item in materiels" :key="item.id">
-          {{ item.name }} - Statut: {{ item.assignedBool ? 'Assigné' : 'Non assigné' }}
-          <div class="actions">
-            <button @click="modifierMateriel(item)">Modifier</button>
-            <button @click="supprimerMateriel(item.id)">Supprimer</button>
-          </div>
-        </li>
-      </ul>
-      <p v-else>Aucun matériel disponible</p>
-    </div>
-  </div>
+  </VLayout>
 </template>
 
 <script>
 import "toastify-js/src/toastify.css";
 import Toastify from 'toastify-js';
+import VLayout from "@/layouts/VLayout.vue";
+
 export default {
   name: 'MaterielView',
+  components: {VLayout},
   data() {
     return {
       materiels: [],
@@ -169,7 +174,7 @@ export default {
 
         const response = await fetch('http://localhost:4000/materiels', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(materielData)
         });
 
@@ -224,7 +229,7 @@ export default {
 
         const response = await fetch(`http://localhost:4000/materiels/${this.materiel.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(materielData)
         });
 
@@ -290,7 +295,7 @@ export default {
     },
 
     modifierMateriel(materiel) {
-      this.materiel = { ...materiel };
+      this.materiel = {...materiel};
       if (materiel.mapping) {
         this.typeAssignation = materiel.mapping.type;
         this.selectedId = materiel.mapping.idType;

@@ -20,9 +20,14 @@ export function useUser() {
         return response.data;
     };
 
+    const fetchIntervenants = async (): Promise<User[]> => {
+        const response = await axiosInstance.get<User[]>('/intervenants');
+        return response.data;
+    }
+
     const addUser = async (user: User): Promise<User> => {
         const response = await axiosInstance.post<User>(API_URL, user);
-        return response.data.user;
+        return response.data?.user;
     };
 
     const updateUser = async (user: User): Promise<User> => {
@@ -68,5 +73,6 @@ export function useUser() {
         deleteUser,
         getRoleColor,
         getRoleName,
+        fetchIntervenants,
     };
 }

@@ -5,6 +5,7 @@
 Arthur VALENTIM @Valentin460
   - CRUD user, Student, Intervenant, Post, Comment, Matiere, Promotion, Cours, Indispo, Pause, Periode, Contrainte (en cours), middleware(auth, upload image) : Riad AHMED YAHIA @riri95500
   - CRUD user (pas utilisé), auth middleware(pas utilisé), front login(pas utilisé) et aide sur les materiels attitrés a un utilisateurs/salles : Léo Poumailloux
+  - CRUD users, intervenants, promotions, matières, salles, cours, assinger une matiere, layouts et login page: Riadh Benchouche @riadh-benchouche
 
 # Procédure d’installation et de lancement de votre solution
 

@@ -16,10 +16,14 @@ const props = defineProps<{
   showActions: boolean;
   showAddButton: true;
   addButtonLabel: string;
+  showAssignButton?: false;
   onAdd?: () => void;
   onEdit?: (row: Record<string, any>) => void;
   onDelete?: (row: Record<string, any>) => void;
+  onAssign?: (row: Record<string, any>) => void;
 }>();
+
+defineEmits(['assign', 'edit', 'delete']);
 </script>
 
 <template>
@@ -91,6 +95,12 @@ const props = defineProps<{
                                 leave-to-class="transform opacity-0 scale-95">
                       <MenuItems
                           class="absolute right-5 z-50 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                        <MenuItem v-if="props.showAssignButton" v-slot="{ active }">
+                          <button @click="$emit('assign', row)"
+                                  :class="[active ? 'bg-gray-100 text-gray-900 outline-none' : 'text-gray-700', 'w-full block px-4 py-2 text-sm text-start']">
+                            Assigner une matière
+                          </button>
+                        </MenuItem>
                         <MenuItem v-slot="{ active }">
                           <button @click="$emit('edit', row)"
                                   :class="[active ? 'bg-gray-100 text-gray-900 outline-none' : 'text-gray-700', 'w-full block px-4 py-2 text-sm text-start']">

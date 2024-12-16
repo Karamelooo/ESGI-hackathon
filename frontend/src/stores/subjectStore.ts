@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import {ref} from 'vue';
 import {showToast} from "@/utils/taost.ts";
-import {type Subject, useSubject} from "@/composables/useSubject.ts";
+import {type Subject, type SubjectMapping, useSubject} from "@/composables/useSubject.ts";
 
 export const useSubjectStore = defineStore('subject', () => {
     const subjects = ref<Subject[]>([]);
@@ -14,7 +14,7 @@ export const useSubjectStore = defineStore('subject', () => {
     const loading = ref<boolean>(false);
     const error = ref<string | null>(null);
 
-    const {fetchSubjects, addSubject, updateSubject, deleteSubject} = useSubject();
+    const {fetchSubjects, addSubject, updateSubject, deleteSubject, createSubjectMapping} = useSubject();
 
     const loadSubjects = async () => {
         loading.value = true;
@@ -64,6 +64,16 @@ export const useSubjectStore = defineStore('subject', () => {
         }
     };
 
+    const assignSubject = async (subjectMapping: SubjectMapping) => {
+        try {
+            await createSubjectMapping(subjectMapping);
+            showToast('Salle assignée avec succès', 'success');
+        } catch (err) {
+            error.value = (err as Error).message;
+            showToast('Erreur lors de l\'assignation de la salle', 'error');
+        }
+    }
+
 
     return {
         columns,
@@ -74,5 +84,6 @@ export const useSubjectStore = defineStore('subject', () => {
         createSubject,
         modifySubject,
         removeSubject,
+        assignSubject
     };
 });

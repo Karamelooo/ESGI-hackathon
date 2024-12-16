@@ -35,7 +35,7 @@ const navigation = ref([
   {name: 'Promotions', href: '/promotions', icon: UsersIcon},
   {name: 'Matières', href: '/subjects', icon: BookmarkIcon},
   {name: 'Calendar', href: '/calendar', icon: CalendarIcon},
-  {name: 'Material', href: '/materials', icon: DocumentDuplicateIcon},
+  {name: 'Material', href: '/materiels', icon: DocumentDuplicateIcon},
   {name: 'Statistics', href: '/statistics', icon: ChartPieIcon},
 ])
 
@@ -46,7 +46,7 @@ const userNavigation = [
 
 const sidebarOpen = ref(false)
 
-const isActive = (href) => route.fullPath === href;
+const isActive = (href: string) => route.fullPath === href;
 </script>
 
 <template>
